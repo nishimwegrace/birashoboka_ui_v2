@@ -1,0 +1,6 @@
+{
+  "name": "Birashoboka Center",
+  "description": "Dynamic web frontend for Birashoboka Center (CRBN & The Chris Lyricure / HVP Makebuko) consuming PHP Eloquent API endpoints with Tailwind CSS styling.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

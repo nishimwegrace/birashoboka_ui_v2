@@ -1,0 +1,117 @@
+import React, { useRef } from 'react';
+import { ChevronLeft, ChevronRight, Handshake, ArrowRight } from 'lucide-react';
+import { Partner } from '../types';
+
+interface PartnersCarouselProps {
+  partners: Partner[];
+  navigate: (path: string) => void;
+}
+
+export const PartnersCarousel: React.FC<PartnersCarouselProps> = ({ partners, navigate }) => {
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  const scrollLeft = () => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollBy({ left: -280, behavior: 'smooth' });
+    }
+  };
+
+  const scrollRight = () => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollBy({ left: 280, behavior: 'smooth' });
+    }
+  };
+
+  return (
+    <section className="py-16 md:py-20 bg-white border-b border-slate-200/80 overflow-hidden">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        {/* Header with manual controllers */}
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-8 gap-4">
+          <div>
+            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-bold uppercase tracking-wider border border-blue-200">
+              <Handshake className="w-3.5 h-3.5" />
+              Strategic Alliances
+            </span>
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight mt-2">
+              Our Trusted Partners & Supporters
+            </h2>
+            <p className="text-slate-500 text-xs sm:text-sm mt-1 max-w-xl">
+              Working hand in hand with institutional donors, UN bodies, and health initiatives.
+            </p>
+          </div>
+
+          {/* Carousel Manual Controllers */}
+          <div className="flex items-center gap-2">
+            <button
+              onClick={scrollLeft}
+              aria-label="Scroll Partners Left"
+              className="p-2.5 rounded-full border border-slate-200 hover:bg-slate-100 text-slate-700 transition active:scale-95 shadow-xs cursor-pointer"
+            >
+              <ChevronLeft className="w-5 h-5" />
+            </button>
+            <button
+              onClick={scrollRight}
+              aria-label="Scroll Partners Right"
+              className="p-2.5 rounded-full border border-slate-200 hover:bg-slate-100 text-slate-700 transition active:scale-95 shadow-xs cursor-pointer"
+            >
+              <ChevronRight className="w-5 h-5" />
+            </button>
+            <button
+              onClick={() => navigate('/partners')}
+              className="ml-2 text-xs font-bold text-blue-600 hover:text-blue-700 inline-flex items-center gap-1"
+            >
+              All Partners <ArrowRight className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        </div>
+
+        {/* Continuous Auto-Scroll Track + Manual Scroll Area */}
+        {/* Rule requirement: No cards, fixed height with relative width to make logos fully visible */}
+        <div 
+          ref={scrollContainerRef}
+          className="overflow-x-auto no-scrollbar py-4 -mx-4 px-4 scroll-smooth"
+        >
+          <div className="flex items-center gap-10 sm:gap-14 animate-marquee min-w-full">
+            {/* Duplicated list for seamless infinite loop */}
+            {[...partners, ...partners, ...partners].map((partner, index) => (
+              <div
+                key={`${partner.id}-${index}`}
+                onClick={() => navigate('/partners')}
+                className="shrink-0 flex items-center justify-center grayscale hover:grayscale-0 opacity-75 hover:opacity-100 transition-all duration-300 cursor-pointer group"
+              >
+                {partner.logo ? (
+                  <div className="flex items-center justify-center p-2 rounded-xl hover:bg-slate-50 transition">
+                    <img
+                      src={partner.logo}
+                      alt={partner.name}
+                      loading="lazy"
+                      className="h-16 md:h-20 w-auto object-contain max-w-[200px] transition-transform duration-300 group-hover:scale-105"
+                    />
+                  </div>
+                ) : (
+                  <div className="h-16 md:h-20 px-6 py-2 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-center text-sm font-bold text-slate-700 hover:text-blue-600 transition shadow-2xs whitespace-nowrap">
+                    {partner.name}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Bottom invitation */}
+        <div className="mt-8 pt-6 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
+          <span>Interested in partnering with Birashoboka Center to empower more vulnerable women?</span>
+          <button
+            type="button"
+            onClick={() => navigate('/contact?subject=Partnership')}
+            className="text-xs font-bold text-blue-600 hover:text-blue-700 underline underline-offset-4 cursor-pointer"
+          >
+            Propose a Partnership &rarr;
+          </button>
+        </div>
+
+      </div>
+    </section>
+  );
+};
