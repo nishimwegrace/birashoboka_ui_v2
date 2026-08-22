@@ -8,22 +8,14 @@ import {
   CheckCircle2, 
   ShieldCheck 
 } from 'lucide-react';
-import { Volet, Activity, Campaign } from '../types';
 
-interface ProgramsPageProps {
-  volets: Volet[];
-  activities: Activity[];
-  campaigns: Campaign[];
-  navigate: (path: string) => void;
-}
-
-export const ProgramsPage: React.FC<ProgramsPageProps> = ({
+export const ProgramsPage = ({
   volets,
   activities,
   campaigns,
   navigate
 }) => {
-  const [selectedTarget, setSelectedTarget] = useState<'all' | 'women' | 'young'>('all');
+  const [selectedTarget, setSelectedTarget] = useState('all');
 
   const filteredVolets = selectedTarget === 'all'
     ? volets

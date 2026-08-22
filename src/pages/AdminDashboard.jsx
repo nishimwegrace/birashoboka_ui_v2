@@ -32,45 +32,9 @@ import {
   Settings,
   AlertCircle
 } from 'lucide-react';
-import { 
-  User, 
-  Student, 
-  Inscription, 
-  Campaign, 
-  Post, 
-  Volet, 
-  Activity, 
-  Partner, 
-  Member 
-} from '../types';
-import { ApiService } from '../services/api';
+import { ApiService } from '../services/api.js';
 
-interface AdminDashboardProps {
-  currentUser: User | null;
-  students: Student[];
-  inscriptions: Inscription[];
-  campaigns: Campaign[];
-  posts: Post[];
-  volets: Volet[];
-  activities: Activity[];
-  partners: Partner[];
-  members: Member[];
-  onUpdateStudents: (students: Student[]) => void;
-  onUpdateInscriptions: (inscriptions: Inscription[]) => void;
-  onUpdateCampaigns: (campaigns: Campaign[]) => void;
-  onUpdatePosts: (posts: Post[]) => void;
-  onUpdateVolets: (volets: Volet[]) => void;
-  onUpdateActivities: (activities: Activity[]) => void;
-  onUpdatePartners: (partners: Partner[]) => void;
-  onUpdateMembers: (members: Member[]) => void;
-  onLogout: () => void;
-  navigate: (path: string) => void;
-  onOpenApiSettings: () => void;
-}
-
-type AdminTab = 'students' | 'campaigns' | 'posts' | 'volets' | 'partners' | 'members';
-
-export const AdminDashboard: React.FC<AdminDashboardProps> = ({
+export const AdminDashboard = ({
   currentUser,
   students,
   inscriptions,
@@ -92,43 +56,43 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   navigate,
   onOpenApiSettings
 }) => {
-  const [activeTab, setActiveTab] = useState<AdminTab>('students');
+  const [activeTab, setActiveTab] = useState('students');
   const [searchQuery, setSearchQuery] = useState('');
-  const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'approved' | 'rejected'>('all');
-  const [voletFilter, setVoletFilter] = useState<number | 'all'>('all');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [voletFilter, setVoletFilter] = useState('all');
 
   // Modals state
-  const [viewingStudentDossier, setViewingStudentDossier] = useState<{ student: Student; inscription: Inscription } | null>(null);
-  const [editingStudent, setEditingStudent] = useState<Student | null>(null);
+  const [viewingStudentDossier, setViewingStudentDossier] = useState(null);
+  const [editingStudent, setEditingStudent] = useState(null);
   
   // Post modal
   const [postModalOpen, setPostModalOpen] = useState(false);
-  const [editingPost, setEditingPost] = useState<Partial<Post> | null>(null);
+  const [editingPost, setEditingPost] = useState(null);
 
   // Campaign modal
   const [campaignModalOpen, setCampaignModalOpen] = useState(false);
-  const [editingCampaign, setEditingCampaign] = useState<Partial<Campaign> | null>(null);
+  const [editingCampaign, setEditingCampaign] = useState(null);
 
   // Volet modal
   const [voletModalOpen, setVoletModalOpen] = useState(false);
-  const [editingVolet, setEditingVolet] = useState<Partial<Volet> | null>(null);
+  const [editingVolet, setEditingVolet] = useState(null);
 
   // Activity modal
   const [activityModalOpen, setActivityModalOpen] = useState(false);
-  const [editingActivity, setEditingActivity] = useState<Partial<Activity> | null>(null);
+  const [editingActivity, setEditingActivity] = useState(null);
 
   // Partner modal
   const [partnerModalOpen, setPartnerModalOpen] = useState(false);
-  const [editingPartner, setEditingPartner] = useState<Partial<Partner> | null>(null);
+  const [editingPartner, setEditingPartner] = useState(null);
 
   // Member modal
   const [memberModalOpen, setMemberModalOpen] = useState(false);
-  const [editingMember, setEditingMember] = useState<Partial<Member> | null>(null);
+  const [editingMember, setEditingMember] = useState(null);
 
   // Success toast message
-  const [notification, setNotification] = useState<string | null>(null);
+  const [notification, setNotification] = useState(null);
 
-  const showNotification = (msg: string) => {
+  const showNotification = (msg) => {
     setNotification(msg);
     setTimeout(() => setNotification(null), 3500);
   };
@@ -214,7 +178,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   };
 
   // Change Inscription Status
-  const handleUpdateStatus = (inscriptionId: number, newStatus: 'pending' | 'approved' | 'rejected') => {
+  const handleUpdateStatus = (inscriptionId, newStatus) => {
     const updated = inscriptions.map(ins => 
       ins.id === inscriptionId ? { ...ins, status: newStatus } : ins
     );
@@ -229,7 +193,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   };
 
   // Toggle Campaign Open/Close
-  const handleToggleCampaignStatus = (campaignId: number) => {
+  const handleToggleCampaignStatus = (campaignId) => {
     const updated = campaigns.map(c => {
       if (c.id === campaignId) {
         const nextState = c.is_open === false ? true : false;
@@ -242,16 +206,16 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   };
 
   // Save Campaign Modal
-  const handleSaveCampaign = (e: React.FormEvent) => {
+  const handleSaveCampaign = (e) => {
     e.preventDefault();
     if (!editingCampaign?.title || !editingCampaign.edition) return;
 
     if (editingCampaign.id) {
-      const updated = campaigns.map(c => c.id === editingCampaign.id ? { ...c, ...editingCampaign } as Campaign : c);
+      const updated = campaigns.map(c => c.id === editingCampaign.id ? { ...c, ...editingCampaign } : c);
       onUpdateCampaigns(updated);
       showNotification('Campaign updated successfully!');
     } else {
-      const newCamp: Campaign = {
+      const newCamp = {
         id: Date.now(),
         edition: editingCampaign.edition,
         title: editingCampaign.title,
@@ -274,16 +238,16 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   };
 
   // Save Post Modal
-  const handleSavePost = (e: React.FormEvent) => {
+  const handleSavePost = (e) => {
     e.preventDefault();
     if (!editingPost?.title || !editingPost.description) return;
 
     if (editingPost.id) {
-      const updated = posts.map(p => p.id === editingPost.id ? { ...p, ...editingPost } as Post : p);
+      const updated = posts.map(p => p.id === editingPost.id ? { ...p, ...editingPost } : p);
       onUpdatePosts(updated);
       showNotification('Article updated successfully!');
     } else {
-      const newPost: Post = {
+      const newPost = {
         id: Date.now(),
         volet_id: editingPost.volet_id || 1,
         title: editingPost.title,
@@ -300,7 +264,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     setEditingPost(null);
   };
 
-  const handleDeletePost = (id: number) => {
+  const handleDeletePost = (id) => {
     if (window.confirm('Are you sure you want to delete this post?')) {
       onUpdatePosts(posts.filter(p => p.id !== id));
       showNotification('Post deleted.');
@@ -308,16 +272,16 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   };
 
   // Save Volet Modal
-  const handleSaveVolet = (e: React.FormEvent) => {
+  const handleSaveVolet = (e) => {
     e.preventDefault();
     if (!editingVolet?.name) return;
 
     if (editingVolet.id) {
-      const updated = volets.map(v => v.id === editingVolet.id ? { ...v, ...editingVolet } as Volet : v);
+      const updated = volets.map(v => v.id === editingVolet.id ? { ...v, ...editingVolet } : v);
       onUpdateVolets(updated);
       showNotification('Volet updated!');
     } else {
-      const newVolet: Volet = {
+      const newVolet = {
         id: Date.now(),
         name: editingVolet.name,
         slogan: editingVolet.slogan || '',
@@ -334,16 +298,16 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   };
 
   // Save Activity Modal
-  const handleSaveActivity = (e: React.FormEvent) => {
+  const handleSaveActivity = (e) => {
     e.preventDefault();
     if (!editingActivity?.title) return;
 
     if (editingActivity.id) {
-      const updated = activities.map(a => a.id === editingActivity.id ? { ...a, ...editingActivity } as Activity : a);
+      const updated = activities.map(a => a.id === editingActivity.id ? { ...a, ...editingActivity } : a);
       onUpdateActivities(updated);
       showNotification('Activity updated!');
     } else {
-      const newAct: Activity = {
+      const newAct = {
         id: Date.now(),
         volet_id: editingActivity.volet_id || 1,
         title: editingActivity.title,
@@ -358,16 +322,16 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   };
 
   // Save Partner Modal
-  const handleSavePartner = (e: React.FormEvent) => {
+  const handleSavePartner = (e) => {
     e.preventDefault();
     if (!editingPartner?.name) return;
 
     if (editingPartner.id) {
-      const updated = partners.map(p => p.id === editingPartner.id ? { ...p, ...editingPartner } as Partner : p);
+      const updated = partners.map(p => p.id === editingPartner.id ? { ...p, ...editingPartner } : p);
       onUpdatePartners(updated);
       showNotification('Partner updated!');
     } else {
-      const newPartner: Partner = {
+      const newPartner = {
         id: Date.now(),
         name: editingPartner.name,
         type: editingPartner.type || 'Partner Organization',
@@ -382,7 +346,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     setEditingPartner(null);
   };
 
-  const handleDeletePartner = (id: number) => {
+  const handleDeletePartner = (id) => {
     if (window.confirm('Delete partner?')) {
       onUpdatePartners(partners.filter(p => p.id !== id));
       showNotification('Partner deleted.');
@@ -390,16 +354,16 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   };
 
   // Save Member Modal
-  const handleSaveMember = (e: React.FormEvent) => {
+  const handleSaveMember = (e) => {
     e.preventDefault();
     if (!editingMember?.name || !editingMember.position) return;
 
     if (editingMember.id) {
-      const updated = members.map(m => m.id === editingMember.id ? { ...m, ...editingMember } as Member : m);
+      const updated = members.map(m => m.id === editingMember.id ? { ...m, ...editingMember } : m);
       onUpdateMembers(updated);
       showNotification('Team member updated!');
     } else {
-      const newM: Member = {
+      const newM = {
         id: Date.now(),
         name: editingMember.name,
         position: editingMember.position,
@@ -414,7 +378,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     setEditingMember(null);
   };
 
-  const handleDeleteMember = (id: number) => {
+  const handleDeleteMember = (id) => {
     if (window.confirm('Are you sure you want to remove this team member?')) {
       onUpdateMembers(members.filter(m => m.id !== id));
       showNotification('Team member removed.');
@@ -422,7 +386,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   };
 
   // Save Student Edit
-  const handleSaveStudentEdit = (e: React.FormEvent) => {
+  const handleSaveStudentEdit = (e) => {
     e.preventDefault();
     if (!editingStudent) return;
     const updated = students.map(s => s.id === editingStudent.id ? editingStudent : s);
@@ -687,7 +651,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
                 <select
                   value={statusFilter}
-                  onChange={(e) => setStatusFilter(e.target.value as any)}
+                  onChange={(e) => setStatusFilter(e.target.value)}
                   className="px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white text-xs font-medium focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="all">All Statuses</option>

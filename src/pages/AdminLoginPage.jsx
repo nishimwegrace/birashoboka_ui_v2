@@ -1,20 +1,14 @@
 import React, { useState } from 'react';
 import { Lock, Mail, ShieldCheck, ArrowRight, Sparkles, Building2, UserCheck, AlertCircle } from 'lucide-react';
-import { User } from '../types';
 
-interface AdminLoginPageProps {
-  onLogin: (user: User) => void;
-  navigate: (path: string) => void;
-}
-
-export const AdminLoginPage: React.FC<AdminLoginPageProps> = ({ onLogin, navigate }) => {
+export const AdminLoginPage = ({ onLogin, navigate }) => {
   const [email, setEmail] = useState('admin@birashobokacenter.org');
   const [password, setPassword] = useState('admin123');
   const [rememberMe, setRememberMe] = useState(true);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     setError('');
 
@@ -28,7 +22,7 @@ export const AdminLoginPage: React.FC<AdminLoginPageProps> = ({ onLogin, navigat
     setTimeout(() => {
       setIsLoading(false);
       // Authenticate user
-      const authUser: User = {
+      const authUser = {
         id: 1,
         name: 'Gérard Nishimwe',
         email: email.trim(),
@@ -41,7 +35,7 @@ export const AdminLoginPage: React.FC<AdminLoginPageProps> = ({ onLogin, navigat
   };
 
   const handleInstantDemoLogin = () => {
-    const authUser: User = {
+    const authUser = {
       id: 1,
       name: 'Admissions & Center Coordinator',
       email: 'admin@birashobokacenter.org',

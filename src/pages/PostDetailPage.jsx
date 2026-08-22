@@ -13,22 +13,14 @@ import {
   Eye,
   Tag
 } from 'lucide-react';
-import { Post, Volet } from '../types';
 
-interface PostDetailPageProps {
-  postId: string;
-  posts: Post[];
-  volets: Volet[];
-  navigate: (path: string) => void;
-}
-
-export const PostDetailPage: React.FC<PostDetailPageProps> = ({
+export const PostDetailPage = ({
   postId,
   posts,
   volets,
   navigate
 }) => {
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [selectedImage, setSelectedImage] = useState(null);
   const [copiedShare, setCopiedShare] = useState(false);
 
   const currentPost = posts.find(p => String(p.id) === String(postId)) || posts[0];

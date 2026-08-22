@@ -10,11 +10,7 @@ import {
   ExternalLink
 } from 'lucide-react';
 
-interface FooterProps {
-  navigate: (path: string) => void;
-}
-
-export const Footer: React.FC<FooterProps> = ({ navigate }) => {
+export const Footer = ({ navigate }) => {
   const currentYear = new Date().getFullYear();
 
   return (

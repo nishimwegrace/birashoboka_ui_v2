@@ -1,14 +1,7 @@
 import React from 'react';
 import { Handshake, Globe2, ExternalLink, ArrowRight, ShieldCheck, Heart, Sparkles } from 'lucide-react';
-import { Partner, Volet } from '../types';
 
-interface PartnersPageProps {
-  partners: Partner[];
-  volets: Volet[];
-  navigate: (path: string) => void;
-}
-
-export const PartnersPage: React.FC<PartnersPageProps> = ({ partners, volets, navigate }) => {
+export const PartnersPage = ({ partners, volets, navigate }) => {
   return (
     <div className="w-full bg-slate-50 min-h-screen">
       

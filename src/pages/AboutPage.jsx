@@ -14,15 +14,8 @@ import {
   ArrowRight,
   GraduationCap
 } from 'lucide-react';
-import { Member, Partner } from '../types';
 
-interface AboutPageProps {
-  members: Member[];
-  partners: Partner[];
-  navigate: (path: string) => void;
-}
-
-export const AboutPage: React.FC<AboutPageProps> = ({ members, partners, navigate }) => {
+export const AboutPage = ({ members, partners, navigate }) => {
   const coreValues = [
     {
       title: 'Integrity & Transparency',

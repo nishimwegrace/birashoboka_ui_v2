@@ -18,16 +18,9 @@ import {
   setStoredApiBaseUrl, 
   getStoredAuthToken, 
   setStoredAuthToken 
-} from '../services/api';
+} from '../services/api.js';
 
-interface ApiSettingsModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onRefreshData: () => void;
-  isApiLive: boolean;
-}
-
-export const ApiSettingsModal: React.FC<ApiSettingsModalProps> = ({
+export const ApiSettingsModal = ({
   isOpen,
   onClose,
   onRefreshData,
@@ -36,7 +29,7 @@ export const ApiSettingsModal: React.FC<ApiSettingsModalProps> = ({
   const [baseUrl, setBaseUrl] = useState('');
   const [token, setToken] = useState('');
   const [isTesting, setIsTesting] = useState(false);
-  const [testResult, setTestResult] = useState<{ success: boolean; message: string } | null>(null);
+  const [testResult, setTestResult] = useState(null);
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
@@ -60,7 +53,7 @@ export const ApiSettingsModal: React.FC<ApiSettingsModalProps> = ({
     const testUrl = cleanBase ? `${cleanBase}/api/volets` : '/api/volets';
 
     try {
-      const headers: Record<string, string> = { 'Accept': 'application/json' };
+      const headers = { 'Accept': 'application/json' };
       if (token) headers['Authorization'] = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
 
       const res = await fetch(testUrl, { headers });
@@ -72,7 +65,7 @@ export const ApiSettingsModal: React.FC<ApiSettingsModalProps> = ({
           message: `Endpoint responded with HTTP ${res.status}. Check API routes and CORS.`
         });
       }
-    } catch (err: any) {
+    } catch (err) {
       setTestResult({
         success: false,
         message: `Could not reach ${testUrl} (${err.message || 'Network error'}). Using fallback dynamic seed mode.`

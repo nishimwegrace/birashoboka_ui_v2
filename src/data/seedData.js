@@ -1,6 +1,4 @@
-import { Volet, Activity, Partner, Testimonial, Post, Campaign, Member, Student, Inscription } from '../types';
-
-export const SEED_VOLETS: Volet[] = [
+export const SEED_VOLETS = [
   {
     id: 1,
     name: 'CRBN',
@@ -21,7 +19,7 @@ export const SEED_VOLETS: Volet[] = [
   }
 ];
 
-export const SEED_ACTIVITIES: Activity[] = [
+export const SEED_ACTIVITIES = [
   {
     id: 1,
     volet_id: 1,
@@ -94,7 +92,7 @@ export const SEED_ACTIVITIES: Activity[] = [
   }
 ];
 
-export const SEED_POSTS: Post[] = [
+export const SEED_POSTS = [
   {
     id: 1,
     volet_id: 1,
@@ -224,7 +222,7 @@ export const SEED_POSTS: Post[] = [
   }
 ];
 
-export const SEED_PARTNERS: Partner[] = [
+export const SEED_PARTNERS = [
   {
     id: 1,
     name: 'UNFPA Burundi',
@@ -270,7 +268,7 @@ export const SEED_PARTNERS: Partner[] = [
   }
 ];
 
-export const SEED_TESTIMONIALS: Testimonial[] = [
+export const SEED_TESTIMONIALS = [
   {
     id: 1,
     activity_id: 7,
@@ -309,7 +307,7 @@ export const SEED_TESTIMONIALS: Testimonial[] = [
   }
 ];
 
-export const SEED_CAMPAIGNS: Campaign[] = [
+export const SEED_CAMPAIGNS = [
   {
     id: 1,
     volet_id: 1,
@@ -342,7 +340,7 @@ export const SEED_CAMPAIGNS: Campaign[] = [
   }
 ];
 
-export const SEED_STUDENTS: Student[] = [
+export const SEED_STUDENTS = [
   {
     id: 1,
     name: 'Aline Irakoze',
@@ -430,7 +428,7 @@ export const SEED_STUDENTS: Student[] = [
   }
 ];
 
-export const SEED_INSCRIPTIONS: Inscription[] = [
+export const SEED_INSCRIPTIONS = [
   {
     id: 1,
     reference_number: 'INS-2026-001',
@@ -508,7 +506,7 @@ export const SEED_INSCRIPTIONS: Inscription[] = [
   }
 ];
 
-export const SEED_MEMBERS: Member[] = [
+export const SEED_MEMBERS = [
   {
     id: 1,
     name: 'Gérard Nishimwe',
@@ -550,4 +548,3 @@ export const SEED_MEMBERS: Member[] = [
     email: 'logistique@birashobokacenter.org'
   }
 ];
-

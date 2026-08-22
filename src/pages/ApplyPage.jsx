@@ -22,20 +22,9 @@ import {
   Layers,
   ChevronRight
 } from 'lucide-react';
-import { Campaign, Volet, Activity, Student, Inscription } from '../types';
-import { ApiService } from '../services/api';
+import { ApiService } from '../services/api.js';
 
-interface ApplyPageProps {
-  campaigns: Campaign[];
-  volets: Volet[];
-  activities: Activity[];
-  initialVoletName?: string;
-  initialActivityId?: number;
-  navigate: (path: string) => void;
-  onStudentEnrolled?: (student: Student, inscription: Inscription) => void;
-}
-
-export const ApplyPage: React.FC<ApplyPageProps> = ({
+export const ApplyPage = ({
   campaigns,
   volets,
   activities,
@@ -55,8 +44,8 @@ export const ApplyPage: React.FC<ApplyPageProps> = ({
 
   // Form State: Student fields (only personal info of student)
   const [fullName, setFullName] = useState('');
-  const [gender, setGender] = useState<'female' | 'male' | 'other'>('female');
-  const [age, setAge] = useState<number>(20);
+  const [gender, setGender] = useState('female');
+  const [age, setAge] = useState(20);
   const [birthDate, setBirthDate] = useState('');
   const [nationality, setNationality] = useState('Burundaise');
   const [phone, setPhone] = useState('');
@@ -68,29 +57,26 @@ export const ApplyPage: React.FC<ApplyPageProps> = ({
   const [educationLevel, setEducationLevel] = useState('Fundamental School (9ème)');
 
   // Form State: Inscription fields
-  const [selectedCampaignId, setSelectedCampaignId] = useState<number>(defaultCampaign?.id || 1);
-  const [selectedVoletId, setSelectedVoletId] = useState<number>(
+  const [selectedCampaignId, setSelectedCampaignId] = useState(defaultCampaign?.id || 1);
+  const [selectedVoletId, setSelectedVoletId] = useState(
     defaultCampaign?.volet_id || matchedVolet?.id || 1
   );
-  const [selectedActivityId, setSelectedActivityId] = useState<number | null>(
+  const [selectedActivityId, setSelectedActivityId] = useState(
     defaultCampaign?.activity_id || initialActivityId || null
   );
-  const [preferredCenter, setPreferredCenter] = useState<'ngozi' | 'bujumbura'>('ngozi');
-  const [preferredSchedule, setPreferredSchedule] = useState<'morning' | 'afternoon' | 'evening'>('morning');
+  const [preferredCenter, setPreferredCenter] = useState('ngozi');
+  const [preferredSchedule, setPreferredSchedule] = useState('morning');
   const [motivation, setMotivation] = useState('');
   const [previousExperience, setPreviousExperience] = useState('');
   const [agreeTerms, setAgreeTerms] = useState(true);
 
   // Submission UI States
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submissionResult, setSubmissionResult] = useState<{
-    student: Student;
-    inscription: Inscription;
-  } | null>(null);
+  const [submissionResult, setSubmissionResult] = useState(null);
   const [errorMessage, setErrorMessage] = useState('');
 
   // When selected campaign changes, sync volet and activity if set on campaign
-  const handleCampaignChange = (campaignId: number) => {
+  const handleCampaignChange = (campaignId) => {
     setSelectedCampaignId(campaignId);
     const camp = campaigns.find(c => c.id === campaignId);
     if (camp) {
@@ -116,7 +102,7 @@ export const ApplyPage: React.FC<ApplyPageProps> = ({
   const currentVolet = volets.find(v => v.id === (activeCampaign?.volet_id || selectedVoletId)) || volets[0];
   const currentActivity = activities.find(a => a.id === (activeCampaign?.activity_id || selectedActivityId)) || availableActivities[0] || activities[0];
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setErrorMessage('');
 
@@ -177,7 +163,7 @@ export const ApplyPage: React.FC<ApplyPageProps> = ({
       } else {
         setErrorMessage(result.message || 'Submission failed. Please try again.');
       }
-    } catch (err: any) {
+    } catch (err) {
       setErrorMessage(err?.message || 'Error occurred while saving enrollment application.');
     } finally {
       setIsSubmitting(false);
@@ -556,7 +542,7 @@ export const ApplyPage: React.FC<ApplyPageProps> = ({
                   </label>
                   <select
                     value={gender}
-                    onChange={(e) => setGender(e.target.value as any)}
+                    onChange={(e) => setGender(e.target.value)}
                     className="w-full px-4 py-3 rounded-xl border border-slate-300 text-slate-900 text-sm font-medium focus:ring-2 focus:ring-blue-500"
                   >
                     <option value="female">Female (Femme)</option>

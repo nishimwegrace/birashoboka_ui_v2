@@ -1,20 +1,13 @@
 import React from 'react';
 import { Image as ImageIcon, ArrowRight, ExternalLink, Sparkles } from 'lucide-react';
-import { Post } from '../types';
 
-interface GallerySectionProps {
-  posts: Post[];
-  navigate: (path: string) => void;
-  isFullPage?: boolean;
-}
-
-export const GallerySection: React.FC<GallerySectionProps> = ({ 
+export const GallerySection = ({ 
   posts, 
   navigate, 
   isFullPage = false 
 }) => {
   // Extract all images from posts (both featured_image and image_urls array)
-  const galleryItems: { imageUrl: string; post: Post; index: number }[] = [];
+  const galleryItems = [];
 
   posts.forEach((post) => {
     const urls = (post.image_urls && post.image_urls.length > 0)

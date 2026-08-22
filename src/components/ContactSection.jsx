@@ -12,15 +12,9 @@ import {
   CreditCard,
   Sparkles
 } from 'lucide-react';
-import { ApiService } from '../services/api';
+import { ApiService } from '../services/api.js';
 
-interface ContactSectionProps {
-  navigate: (path: string) => void;
-  isFullPage?: boolean;
-  initialIntent?: string;
-}
-
-export const ContactSection: React.FC<ContactSectionProps> = ({ 
+export const ContactSection = ({ 
   navigate,
   isFullPage = false,
   initialIntent = ''
@@ -36,9 +30,9 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitResult, setSubmitResult] = useState<{ success: boolean; message: string } | null>(null);
+  const [submitResult, setSubmitResult] = useState(null);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
     setSubmitResult(null);

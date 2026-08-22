@@ -1,13 +1,7 @@
 import React from 'react';
 import { Calendar, ArrowRight, Sparkles, Tag } from 'lucide-react';
-import { Post } from '../types';
 
-interface LatestNewsSectionProps {
-  posts: Post[];
-  navigate: (path: string) => void;
-}
-
-export const LatestNewsSection: React.FC<LatestNewsSectionProps> = ({ posts, navigate }) => {
+export const LatestNewsSection = ({ posts, navigate }) => {
   // Show 10 latest posts
   const latestPosts = posts.slice(0, 10);
 

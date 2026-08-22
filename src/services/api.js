@@ -1,17 +1,4 @@
 import {
-  Volet,
-  Activity,
-  Partner,
-  Testimonial,
-  Post,
-  Campaign,
-  Member,
-  Student,
-  Inscription,
-  ApiResponse,
-  PaginatedData
-} from '../types';
-import {
   SEED_VOLETS,
   SEED_ACTIVITIES,
   SEED_POSTS,
@@ -23,11 +10,10 @@ import {
   SEED_INSCRIPTIONS
 } from '../data/seedData';
 
-
 const BASE_URL_STORAGE_KEY = 'birashoboka_api_base_url';
 const AUTH_TOKEN_STORAGE_KEY = 'birashoboka_api_token';
 
-export function getStoredApiBaseUrl(): string {
+export function getStoredApiBaseUrl() {
   if (typeof window === 'undefined') return 'http://localhost:8000';
   const saved = localStorage.getItem(BASE_URL_STORAGE_KEY);
   if (saved && saved.trim()) return saved.trim();
@@ -35,29 +21,25 @@ export function getStoredApiBaseUrl(): string {
   return window.location.hostname === 'localhost' ? 'http://localhost:8000' : '';
 }
 
-export function setStoredApiBaseUrl(url: string): void {
+export function setStoredApiBaseUrl(url) {
   if (typeof window !== 'undefined') {
     localStorage.setItem(BASE_URL_STORAGE_KEY, url.trim());
   }
 }
 
-export function getStoredAuthToken(): string {
+export function getStoredAuthToken() {
   if (typeof window === 'undefined') return '';
   return localStorage.getItem(AUTH_TOKEN_STORAGE_KEY) || '';
 }
 
-export function setStoredAuthToken(token: string): void {
+export function setStoredAuthToken(token) {
   if (typeof window !== 'undefined') {
     localStorage.setItem(AUTH_TOKEN_STORAGE_KEY, token.trim());
   }
 }
 
 // Fetch helper with timeout & fallback
-async function fetchWithFallback<T>(
-  endpoint: string,
-  fallbackData: T,
-  options?: RequestInit
-): Promise<{ data: T; isLive: boolean; error?: string }> {
+async function fetchWithFallback(endpoint, fallbackData, options) {
   const baseUrl = getStoredApiBaseUrl();
   const token = getStoredAuthToken();
   const cleanBase = baseUrl.replace(/\/+$/, '');
@@ -65,9 +47,9 @@ async function fetchWithFallback<T>(
   const fullUrl = cleanBase ? `${cleanBase}/${cleanEndpoint}` : `/${cleanEndpoint}`;
 
   try {
-    const headers: Record<string, string> = {
+    const headers = {
       'Accept': 'application/json',
-      ...(options?.headers as Record<string, string> || {})
+      ...(options?.headers || {})
     };
 
     if (token) {
@@ -89,12 +71,12 @@ async function fetchWithFallback<T>(
       throw new Error(`HTTP ${response.status}: ${response.statusText}`);
     }
 
-    const json: ApiResponse<any> = await response.json();
+    const json = await response.json();
     if (json && json.data !== undefined) {
-      return { data: json.data as T, isLive: true };
+      return { data: json.data, isLive: true };
     }
-    return { data: json as unknown as T, isLive: true };
-  } catch (err: unknown) {
+    return { data: json, isLive: true };
+  } catch (err) {
     const errMsg = err instanceof Error ? err.message : String(err);
     // Silent fallback to seedData
     return { data: fallbackData, isLive: false, error: errMsg };
@@ -103,8 +85,8 @@ async function fetchWithFallback<T>(
 
 export const ApiService = {
   // Volets
-  async getVolets(): Promise<{ items: Volet[]; isLive: boolean }> {
-    const res = await fetchWithFallback<PaginatedData<Volet> | Volet[]>('api/volets?per_page=50', {
+  async getVolets() {
+    const res = await fetchWithFallback('api/volets?per_page=50', {
       items: SEED_VOLETS,
       pagination: { page: 1, per_page: 50, total: SEED_VOLETS.length, last_page: 1 }
     });
@@ -125,9 +107,9 @@ export const ApiService = {
     return { items: enriched, isLive: res.isLive };
   },
 
-  async getVolet(id: number | string): Promise<{ data: Volet | null; isLive: boolean }> {
+  async getVolet(id) {
     const foundLocal = SEED_VOLETS.find(v => String(v.id) === String(id) || v.name.toLowerCase() === String(id).toLowerCase());
-    const res = await fetchWithFallback<Volet>(`api/volets/${id}`, foundLocal || SEED_VOLETS[0]);
+    const res = await fetchWithFallback(`api/volets/${id}`, foundLocal || SEED_VOLETS[0]);
     
     if (!res.data) return { data: null, isLive: res.isLive };
 
@@ -149,7 +131,7 @@ export const ApiService = {
   },
 
   // Posts
-  async getPosts(page = 1, perPage = 20, voletId?: number): Promise<{ items: Post[]; pagination: any; isLive: boolean }> {
+  async getPosts(page = 1, perPage = 20, voletId) {
     let url = `api/posts?page=${page}&per_page=${perPage}`;
     if (voletId) url += `&volet_id=${voletId}`;
 
@@ -158,7 +140,7 @@ export const ApiService = {
       filteredSeed = SEED_POSTS.filter(p => p.volet_id === voletId);
     }
 
-    const res = await fetchWithFallback<PaginatedData<Post> | Post[]>(url, {
+    const res = await fetchWithFallback(url, {
       items: filteredSeed,
       pagination: {
         page,
@@ -188,9 +170,9 @@ export const ApiService = {
     return { items: enriched, pagination, isLive: res.isLive };
   },
 
-  async getPost(id: number | string): Promise<{ data: Post | null; isLive: boolean }> {
+  async getPost(id) {
     const local = SEED_POSTS.find(p => String(p.id) === String(id));
-    const res = await fetchWithFallback<Post>(`api/posts/${id}`, local || SEED_POSTS[0]);
+    const res = await fetchWithFallback(`api/posts/${id}`, local || SEED_POSTS[0]);
     if (!res.data) return { data: null, isLive: res.isLive };
 
     const post = { ...res.data };
@@ -204,8 +186,8 @@ export const ApiService = {
   },
 
   // Activities
-  async getActivities(): Promise<{ items: Activity[]; isLive: boolean }> {
-    const res = await fetchWithFallback<PaginatedData<Activity> | Activity[]>('api/activities?per_page=50', {
+  async getActivities() {
+    const res = await fetchWithFallback('api/activities?per_page=50', {
       items: SEED_ACTIVITIES,
       pagination: { page: 1, per_page: 50, total: SEED_ACTIVITIES.length, last_page: 1 }
     });
@@ -220,8 +202,8 @@ export const ApiService = {
   },
 
   // Partners
-  async getPartners(): Promise<{ items: Partner[]; isLive: boolean }> {
-    const res = await fetchWithFallback<PaginatedData<Partner> | Partner[]>('api/partners?per_page=50', {
+  async getPartners() {
+    const res = await fetchWithFallback('api/partners?per_page=50', {
       items: SEED_PARTNERS,
       pagination: { page: 1, per_page: 50, total: SEED_PARTNERS.length, last_page: 1 }
     });
@@ -238,8 +220,8 @@ export const ApiService = {
   },
 
   // Testimonials
-  async getTestimonials(): Promise<{ items: Testimonial[]; isLive: boolean }> {
-    const res = await fetchWithFallback<PaginatedData<Testimonial> | Testimonial[]>('api/testimonials?per_page=50', {
+  async getTestimonials() {
+    const res = await fetchWithFallback('api/testimonials?per_page=50', {
       items: SEED_TESTIMONIALS,
       pagination: { page: 1, per_page: 50, total: SEED_TESTIMONIALS.length, last_page: 1 }
     });
@@ -256,8 +238,8 @@ export const ApiService = {
   },
 
   // Campaigns & Inscriptions
-  async getCampaigns(): Promise<{ items: Campaign[]; isLive: boolean }> {
-    const res = await fetchWithFallback<PaginatedData<Campaign> | Campaign[]>('api/campaigns?per_page=20', {
+  async getCampaigns() {
+    const res = await fetchWithFallback('api/campaigns?per_page=20', {
       items: SEED_CAMPAIGNS,
       pagination: { page: 1, per_page: 20, total: SEED_CAMPAIGNS.length, last_page: 1 }
     });
@@ -273,8 +255,8 @@ export const ApiService = {
   },
 
   // Team members
-  async getMembers(): Promise<{ items: Member[]; isLive: boolean }> {
-    const res = await fetchWithFallback<PaginatedData<Member> | Member[]>('api/members?per_page=50', {
+  async getMembers() {
+    const res = await fetchWithFallback('api/members?per_page=50', {
       items: SEED_MEMBERS,
       pagination: { page: 1, per_page: 50, total: SEED_MEMBERS.length, last_page: 1 }
     });
@@ -283,8 +265,8 @@ export const ApiService = {
   },
 
   // Students & Inscriptions
-  async getStudents(): Promise<{ items: Student[]; isLive: boolean }> {
-    const res = await fetchWithFallback<PaginatedData<Student> | Student[]>('api/students?per_page=100', {
+  async getStudents() {
+    const res = await fetchWithFallback('api/students?per_page=100', {
       items: SEED_STUDENTS,
       pagination: { page: 1, per_page: 100, total: SEED_STUDENTS.length, last_page: 1 }
     });
@@ -292,8 +274,8 @@ export const ApiService = {
     return { items, isLive: res.isLive };
   },
 
-  async getInscriptions(): Promise<{ items: Inscription[]; isLive: boolean }> {
-    const res = await fetchWithFallback<PaginatedData<Inscription> | Inscription[]>('api/inscriptions?per_page=100', {
+  async getInscriptions() {
+    const res = await fetchWithFallback('api/inscriptions?per_page=100', {
       items: SEED_INSCRIPTIONS,
       pagination: { page: 1, per_page: 100, total: SEED_INSCRIPTIONS.length, last_page: 1 }
     });
@@ -312,13 +294,7 @@ export const ApiService = {
   },
 
   // Submit Contact Form
-  async submitContact(formData: {
-    name: string;
-    email: string;
-    phone?: string;
-    subject: string;
-    message: string;
-  }): Promise<{ success: boolean; message: string }> {
+  async submitContact(formData) {
     const baseUrl = getStoredApiBaseUrl();
     const cleanBase = baseUrl.replace(/\/+$/, '');
     const url = cleanBase ? `${cleanBase}/api/contact` : '/api/contact';
@@ -342,10 +318,7 @@ export const ApiService = {
   },
 
   // Submit Complete Inscription & Student creation
-  async submitFullEnrollment(payload: {
-    student: Partial<Student>;
-    inscription: Partial<Inscription>;
-  }): Promise<{ success: boolean; student: Student; inscription: Inscription; message: string }> {
+  async submitFullEnrollment(payload) {
     const baseUrl = getStoredApiBaseUrl();
     const cleanBase = baseUrl.replace(/\/+$/, '');
     const url = cleanBase ? `${cleanBase}/api/inscriptions` : '/api/inscriptions';
@@ -354,12 +327,12 @@ export const ApiService = {
     const newInscriptionId = Date.now() + 1;
     const refNum = `INS-2026-${Math.floor(1000 + Math.random() * 9000)}`;
 
-    const createdStudent: Student = {
+    const createdStudent = {
       id: newStudentId,
       name: payload.student.name || 'New Student',
       email: payload.student.email || null,
       phone: payload.student.phone || '+257 79 000 000',
-      gender: (payload.student.gender as any) || 'female',
+      gender: payload.student.gender || 'female',
       age: payload.student.age || 20,
       birth_date: payload.student.birth_date || null,
       nationality: payload.student.nationality || 'Burundaise',
@@ -372,7 +345,7 @@ export const ApiService = {
       created_at: new Date().toISOString()
     };
 
-    const createdInscription: Inscription = {
+    const createdInscription = {
       id: newInscriptionId,
       reference_number: refNum,
       campaign_id: payload.inscription.campaign_id || 1,
@@ -417,9 +390,8 @@ export const ApiService = {
   },
 
   // Save / Update methods for Admin Dashboard
-  async savePost(post: Partial<Post>): Promise<{ success: boolean; post: Post }> {
-    const isNew = !post.id;
-    const newPost: Post = {
+  async savePost(post) {
+    const newPost = {
       id: post.id || Date.now(),
       volet_id: post.volet_id || 1,
       title: post.title || 'Untitled Post',
@@ -432,12 +404,12 @@ export const ApiService = {
     return { success: true, post: newPost };
   },
 
-  async deletePost(id: number): Promise<{ success: boolean }> {
+  async deletePost(id) {
     return { success: true };
   },
 
-  async saveCampaign(campaign: Partial<Campaign>): Promise<{ success: boolean; campaign: Campaign }> {
-    const saved: Campaign = {
+  async saveCampaign(campaign) {
+    const saved = {
       id: campaign.id || Date.now(),
       volet_id: campaign.volet_id || 1,
       activity_id: campaign.activity_id || null,
@@ -455,8 +427,8 @@ export const ApiService = {
     return { success: true, campaign: saved };
   },
 
-  async savePartner(partner: Partial<Partner>): Promise<{ success: boolean; partner: Partner }> {
-    const saved: Partner = {
+  async savePartner(partner) {
+    const saved = {
       id: partner.id || Date.now(),
       name: partner.name || 'New Partner',
       type: partner.type || 'Partner Organization',
@@ -467,8 +439,8 @@ export const ApiService = {
     return { success: true, partner: saved };
   },
 
-  async saveVolet(volet: Partial<Volet>): Promise<{ success: boolean; volet: Volet }> {
-    const saved: Volet = {
+  async saveVolet(volet) {
+    const saved = {
       id: volet.id || Date.now(),
       name: volet.name || 'New Volet',
       slogan: volet.slogan || '',
@@ -480,8 +452,8 @@ export const ApiService = {
     return { success: true, volet: saved };
   },
 
-  async saveActivity(activity: Partial<Activity>): Promise<{ success: boolean; activity: Activity }> {
-    const saved: Activity = {
+  async saveActivity(activity) {
+    const saved = {
       id: activity.id || Date.now(),
       volet_id: activity.volet_id || 1,
       title: activity.title || 'New Activity',
@@ -491,8 +463,8 @@ export const ApiService = {
     return { success: true, activity: saved };
   },
 
-  async saveMember(member: Partial<Member>): Promise<{ success: boolean; member: Member }> {
-    const saved: Member = {
+  async saveMember(member) {
+    const saved = {
       id: member.id || Date.now(),
       name: member.name || 'Team Member',
       position: member.position || 'Staff',
@@ -503,8 +475,7 @@ export const ApiService = {
     return { success: true, member: saved };
   },
 
-  async updateInscriptionStatus(id: number, status: 'pending' | 'approved' | 'rejected' | 'cancelled'): Promise<{ success: boolean }> {
+  async updateInscriptionStatus(id, status) {
     return { success: true };
   }
 };
-

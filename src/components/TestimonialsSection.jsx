@@ -1,13 +1,7 @@
 import React from 'react';
 import { Quote, Star, Sparkles, CheckCircle2 } from 'lucide-react';
-import { Testimonial } from '../types';
 
-interface TestimonialsSectionProps {
-  testimonials: Testimonial[];
-  navigate: (path: string) => void;
-}
-
-export const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({ testimonials, navigate }) => {
+export const TestimonialsSection = ({ testimonials, navigate }) => {
   return (
     <section className="py-16 md:py-24 bg-gradient-to-b from-slate-50 to-white border-b border-slate-200/80">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

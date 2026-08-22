@@ -1,13 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, ArrowRight, Heart, Sparkles, BookOpen } from 'lucide-react';
-import { Post } from '../types';
 
-interface HeroCarouselProps {
-  posts: Post[];
-  navigate: (path: string) => void;
-}
-
-export const HeroCarousel: React.FC<HeroCarouselProps> = ({ posts, navigate }) => {
+export const HeroCarousel = ({ posts, navigate }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
 
@@ -23,12 +17,12 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({ posts, navigate }) =
     return () => clearInterval(timer);
   }, [isHovered, displayPosts.length]);
 
-  const handlePrev = (e: React.MouseEvent) => {
+  const handlePrev = (e) => {
     e.stopPropagation();
     setCurrentIndex((prev) => (prev - 1 + displayPosts.length) % displayPosts.length);
   };
 
-  const handleNext = (e: React.MouseEvent) => {
+  const handleNext = (e) => {
     e.stopPropagation();
     setCurrentIndex((prev) => (prev + 1) % displayPosts.length);
   };

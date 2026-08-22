@@ -21,18 +21,8 @@ import {
   Layers,
   GraduationCap
 } from 'lucide-react';
-import { Volet, Post, Activity, Campaign } from '../types';
 
-interface VoletDetailPageProps {
-  voletNameOrId: string;
-  volets: Volet[];
-  posts: Post[];
-  activities: Activity[];
-  campaigns: Campaign[];
-  navigate: (path: string) => void;
-}
-
-export const VoletDetailPage: React.FC<VoletDetailPageProps> = ({
+export const VoletDetailPage = ({
   voletNameOrId,
   volets,
   posts,

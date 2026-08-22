@@ -1,12 +1,7 @@
 import React from 'react';
-import { ContactSection } from '../components/ContactSection';
+import { ContactSection } from '../components/ContactSection.jsx';
 
-interface ContactPageProps {
-  navigate: (path: string) => void;
-  currentSearch?: string;
-}
-
-export const ContactPage: React.FC<ContactPageProps> = ({ navigate, currentSearch = '' }) => {
+export const ContactPage = ({ navigate, currentSearch = '' }) => {
   const isDonation = currentSearch.includes('intent=donate');
 
   return (

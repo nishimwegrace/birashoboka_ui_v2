@@ -1,25 +1,14 @@
 import React from 'react';
-import { HeroCarousel } from '../components/HeroCarousel';
-import { AboutHomeSection } from '../components/AboutHomeSection';
-import { LatestNewsSection } from '../components/LatestNewsSection';
-import { PartnersCarousel } from '../components/PartnersCarousel';
-import { TestimonialsSection } from '../components/TestimonialsSection';
-import { GallerySection } from '../components/GallerySection';
-import { ContactSection } from '../components/ContactSection';
-import { EnrollmentBanner } from '../components/EnrollmentBanner';
-import { Post, Partner, Testimonial, Volet, Campaign, Activity } from '../types';
+import { HeroCarousel } from '../components/HeroCarousel.jsx';
+import { AboutHomeSection } from '../components/AboutHomeSection.jsx';
+import { LatestNewsSection } from '../components/LatestNewsSection.jsx';
+import { PartnersCarousel } from '../components/PartnersCarousel.jsx';
+import { TestimonialsSection } from '../components/TestimonialsSection.jsx';
+import { GallerySection } from '../components/GallerySection.jsx';
+import { ContactSection } from '../components/ContactSection.jsx';
+import { EnrollmentBanner } from '../components/EnrollmentBanner.jsx';
 
-interface HomePageProps {
-  posts: Post[];
-  partners: Partner[];
-  testimonials: Testimonial[];
-  volets: Volet[];
-  campaigns: Campaign[];
-  activities: Activity[];
-  navigate: (path: string) => void;
-}
-
-export const HomePage: React.FC<HomePageProps> = ({
+export const HomePage = ({
   posts,
   partners,
   testimonials,

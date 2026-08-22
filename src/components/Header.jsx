@@ -20,18 +20,8 @@ import {
   PhoneCall,
   ChevronRight
 } from 'lucide-react';
-import { Volet, Campaign } from '../types';
 
-interface HeaderProps {
-  currentPath: string;
-  navigate: (path: string) => void;
-  volets: Volet[];
-  campaigns?: Campaign[];
-  isApiLive: boolean;
-  onOpenApiSettings: () => void;
-}
-
-export const Header: React.FC<HeaderProps> = ({
+export const Header = ({
   currentPath,
   navigate,
   volets,
@@ -42,18 +32,18 @@ export const Header: React.FC<HeaderProps> = ({
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mobileProgramsOpen, setMobileProgramsOpen] = useState(true);
   const [programsDropdownOpen, setProgramsDropdownOpen] = useState(false);
-  const [hoveredVoletId, setHoveredVoletId] = useState<number | null>(volets[0]?.id || 1);
+  const [hoveredVoletId, setHoveredVoletId] = useState(volets[0]?.id || 1);
 
   const hasOpenCampaign = campaigns.some(c => c.is_open !== false);
   const activeVolet = volets.find(v => v.id === hoveredVoletId) || volets[0];
 
-  const handleNavClick = (path: string) => {
+  const handleNavClick = (path) => {
     navigate(path);
     setMobileMenuOpen(false);
     setProgramsDropdownOpen(false);
   };
 
-  const isActive = (path: string) => {
+  const isActive = (path) => {
     if (path === '/' && currentPath === '/') return true;
     if (path !== '/' && currentPath.startsWith(path)) return true;
     return false;
@@ -73,7 +63,7 @@ export const Header: React.FC<HeaderProps> = ({
 
   // Handle ESC key to close drawer
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
+    const handleKeyDown = (e) => {
       if (e.key === 'Escape' && mobileMenuOpen) {
         setMobileMenuOpen(false);
       }

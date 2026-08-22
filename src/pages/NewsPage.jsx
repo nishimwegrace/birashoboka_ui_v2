@@ -12,32 +12,23 @@ import {
   Clock,
   MapPin
 } from 'lucide-react';
-import { Post, Campaign, Volet, Activity } from '../types';
-import { EnrollmentBanner } from '../components/EnrollmentBanner';
+import { EnrollmentBanner } from '../components/EnrollmentBanner.jsx';
 
-interface NewsPageProps {
-  posts: Post[];
-  campaigns: Campaign[];
-  volets: Volet[];
-  activities?: Activity[];
-  navigate: (path: string) => void;
-}
-
-export const NewsPage: React.FC<NewsPageProps> = ({
+export const NewsPage = ({
   posts,
   campaigns,
   volets,
   activities = [],
   navigate
 }) => {
-  const [selectedVoletId, setSelectedVoletId] = useState<number | null>(null);
+  const [selectedVoletId, setSelectedVoletId] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeBannerIndex, setActiveBannerIndex] = useState(0);
   
   // Infinite scroll simulation state
   const [visibleCount, setVisibleCount] = useState(6);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
-  const loaderRef = useRef<HTMLDivElement>(null);
+  const loaderRef = useRef(null);
 
   // Carousel banner posts (top 5 posts)
   const carouselPosts = posts.slice(0, 5);

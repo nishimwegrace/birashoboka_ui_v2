@@ -1,14 +1,8 @@
 import React, { useRef } from 'react';
 import { ChevronLeft, ChevronRight, Handshake, ArrowRight } from 'lucide-react';
-import { Partner } from '../types';
 
-interface PartnersCarouselProps {
-  partners: Partner[];
-  navigate: (path: string) => void;
-}
-
-export const PartnersCarousel: React.FC<PartnersCarouselProps> = ({ partners, navigate }) => {
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
+export const PartnersCarousel = ({ partners, navigate }) => {
+  const scrollContainerRef = useRef(null);
 
   const scrollLeft = () => {
     if (scrollContainerRef.current) {

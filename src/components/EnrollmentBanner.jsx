@@ -1,17 +1,7 @@
 import React from 'react';
 import { Megaphone, ArrowRight, Calendar, Sparkles, X } from 'lucide-react';
-import { Campaign, Volet, Activity } from '../types';
 
-interface EnrollmentBannerProps {
-  campaign: Campaign;
-  volets: Volet[];
-  activities: Activity[];
-  navigate: (path: string) => void;
-  onDismiss?: () => void;
-  floating?: boolean;
-}
-
-export const EnrollmentBanner: React.FC<EnrollmentBannerProps> = ({
+export const EnrollmentBanner = ({
   campaign,
   volets,
   activities,
@@ -20,7 +10,7 @@ export const EnrollmentBanner: React.FC<EnrollmentBannerProps> = ({
   floating = false
 }) => {
   // If campaign is explicitly closed, do not render
-  if (campaign.is_open === false) return null;
+  if (!campaign || campaign.is_open === false) return null;
 
   const targetVolet = volets.find(v => v.id === campaign.volet_id);
   const targetActivity = activities.find(a => a.id === campaign.activity_id);

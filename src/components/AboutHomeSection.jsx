@@ -10,13 +10,7 @@ import {
   Award
 } from 'lucide-react';
 
-interface AboutHomeSectionProps {
-  navigate: (path: string) => void;
-  partnersCount: number;
-  studentsCount?: number;
-}
-
-export const AboutHomeSection: React.FC<AboutHomeSectionProps> = ({
+export const AboutHomeSection = ({
   navigate,
   partnersCount,
   studentsCount = 5000

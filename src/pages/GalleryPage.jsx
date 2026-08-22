@@ -1,21 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Image as ImageIcon, ArrowRight, Sparkles, Filter, Eye } from 'lucide-react';
-import { Post, Volet } from '../types';
 
-interface GalleryPageProps {
-  posts: Post[];
-  volets: Volet[];
-  navigate: (path: string) => void;
-}
-
-export const GalleryPage: React.FC<GalleryPageProps> = ({ posts, volets, navigate }) => {
-  const [selectedVoletId, setSelectedVoletId] = useState<number | null>(null);
+export const GalleryPage = ({ posts, volets, navigate }) => {
+  const [selectedVoletId, setSelectedVoletId] = useState(null);
   const [visibleCount, setVisibleCount] = useState(12);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
-  const loaderRef = useRef<HTMLDivElement>(null);
+  const loaderRef = useRef(null);
 
   // Extract all images from posts with their associated post reference
-  const allImages: { imageUrl: string; post: Post; id: string }[] = [];
+  const allImages = [];
 
   posts.forEach((post) => {
     const urls = (post.image_urls && post.image_urls.length > 0)
