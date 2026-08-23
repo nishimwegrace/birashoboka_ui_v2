@@ -60,6 +60,7 @@ export const AdminDashboard = ({
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [voletFilter, setVoletFilter] = useState('all');
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   // Modals state
   const [viewingStudentDossier, setViewingStudentDossier] = useState(null);
@@ -95,6 +96,21 @@ export const AdminDashboard = ({
   const showNotification = (msg) => {
     setNotification(msg);
     setTimeout(() => setNotification(null), 3500);
+  };
+
+  // Sidebar nav items
+  const navItems = [
+    { key: 'students',  label: 'Enrollment',  icon: GraduationCap, count: inscriptions.length },
+    { key: 'campaigns', label: 'Campaigns',   icon: Megaphone,      count: campaigns.length },
+    { key: 'posts',     label: 'Articles',    icon: FileText,       count: posts.length },
+    { key: 'volets',    label: 'Volet',       icon: Layers,         count: volets.length },
+    { key: 'partners',  label: 'Partners',    icon: Building2,      count: partners.length },
+    { key: 'members',   label: 'Team',        icon: Users,          count: members.length },
+  ];
+
+  const handleNavClick = (key) => {
+    setActiveTab(key);
+    setSidebarOpen(false);
   };
 
   // Filtered Inscriptions & Students
@@ -400,85 +416,171 @@ export const AdminDashboard = ({
   const totalPending = inscriptions.filter(i => i.status === 'pending').length;
   const activeCampaignsCount = campaigns.filter(c => c.is_open !== false).length;
 
+  // ─── Sidebar Content ────────────────────────────────────────────────────────
+  const SidebarContent = () => (
+    <div className="flex flex-col h-full">
+      {/* Brand */}
+      <div className="px-5 py-5 border-b border-slate-800/70">
+        <button
+          onClick={() => navigate('/')}
+          className="flex items-center gap-3 group cursor-pointer w-full text-left"
+        >
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-700 text-white flex items-center justify-center font-black text-xl shadow-lg flex-shrink-0">
+            B
+          </div>
+          <div>
+            <div className="font-extrabold text-sm text-white group-hover:text-blue-400 transition leading-tight">
+              Birashoboka Admin
+            </div>
+            <div className="text-[10px] text-slate-500 mt-0.5">CRBN · HVPM</div>
+          </div>
+        </button>
+      </div>
+
+      {/* User card */}
+      <div className="px-4 py-4 border-b border-slate-800/50">
+        <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-800/50">
+          <img
+            src={currentUser?.avatar || 'https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=400&q=80'}
+            alt="User"
+            className="w-9 h-9 rounded-full object-cover border-2 border-slate-700 flex-shrink-0"
+          />
+          <div className="min-w-0">
+            <div className="text-xs font-bold text-white truncate">{currentUser?.name || 'Administrator'}</div>
+            <div className="text-[10px] text-emerald-400 font-semibold flex items-center gap-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block animate-pulse" />
+              Active Session
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Navigation */}
+      <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+        <p className="px-3 mb-2 text-[10px] font-black uppercase tracking-widest text-slate-600">
+          Management
+        </p>
+        {navItems.map(({ key, label, icon: Icon, count }) => {
+          const isActive = activeTab === key;
+          return (
+            <button
+              key={key}
+              onClick={() => handleNavClick(key)}
+              className={`w-full flex items-center justify-between gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all duration-150 cursor-pointer group ${
+                isActive
+                  ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/25'
+                  : 'text-slate-400 hover:bg-slate-800 hover:text-white'
+              }`}
+            >
+              <div className="flex items-center gap-3">
+                <Icon className={`w-4 h-4 flex-shrink-0 ${isActive ? 'text-white' : 'text-slate-500 group-hover:text-white'}`} />
+                <span>{label}</span>
+              </div>
+              <span className={`text-[10px] font-black px-1.5 py-0.5 rounded-full min-w-[20px] text-center ${
+                isActive ? 'bg-blue-500/60 text-white' : 'bg-slate-800 text-slate-500 group-hover:bg-slate-700 group-hover:text-slate-300'
+              }`}>
+                {count}
+              </span>
+            </button>
+          );
+        })}
+
+        <div className="pt-4">
+          <p className="px-3 mb-2 text-[10px] font-black uppercase tracking-widest text-slate-600">
+            Settings
+          </p>
+          <button
+            onClick={() => { onOpenApiSettings(); setSidebarOpen(false); }}
+            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-slate-400 hover:bg-slate-800 hover:text-white transition cursor-pointer group"
+          >
+            <SlidersHorizontal className="w-4 h-4 text-slate-500 group-hover:text-white" />
+            <span>API Config</span>
+          </button>
+          <button
+            onClick={() => { navigate('/'); setSidebarOpen(false); }}
+            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-slate-400 hover:bg-slate-800 hover:text-white transition cursor-pointer group"
+          >
+            <ExternalLink className="w-4 h-4 text-slate-500 group-hover:text-white" />
+            <span>View Live Site</span>
+          </button>
+        </div>
+      </nav>
+
+      {/* Logout pinned at bottom */}
+      <div className="px-3 py-4 border-t border-slate-800/70">
+        <button
+          onClick={onLogout}
+          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-rose-400 hover:bg-rose-950/50 hover:text-rose-300 transition cursor-pointer"
+        >
+          <LogOut className="w-4 h-4" />
+          <span>Logout</span>
+        </button>
+      </div>
+    </div>
+  );
+
   return (
-    <div className="w-full bg-slate-950 min-h-screen text-slate-100 flex flex-col">
-      
-      {/* Toast Notification */}
+    <div className="fixed inset-0 bg-slate-950 text-slate-100 flex overflow-hidden">
+
+      {/* ── Toast Notification ── */}
       {notification && (
-        <div className="fixed bottom-6 right-6 z-50 p-4 rounded-2xl bg-emerald-600 text-white font-bold text-sm shadow-2xl flex items-center gap-3 animate-in slide-in-from-bottom duration-200">
+        <div className="fixed bottom-6 right-6 z-[100] p-4 rounded-2xl bg-emerald-600 text-white font-bold text-sm shadow-2xl flex items-center gap-3 animate-in slide-in-from-bottom duration-200">
           <CheckCircle2 className="w-5 h-5" />
           <span>{notification}</span>
         </div>
       )}
 
-      {/* Top Administrative Navigation Bar */}
-      <header className="w-full bg-slate-900 border-b border-slate-800 sticky top-0 z-30">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 flex items-center justify-between gap-4">
-          
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => navigate('/')}
-              className="flex items-center gap-3 text-left group cursor-pointer"
-            >
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-700 text-white flex items-center justify-center font-black text-xl shadow-md">
-                B
-              </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <span className="font-extrabold text-lg text-white group-hover:text-blue-400 transition">
-                    Birashoboka Admin
-                  </span>
-                  <span className="px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-amber-400 text-slate-950">
-                    CRBN · HVPM
-                  </span>
-                </div>
-                <span className="text-xs text-slate-400">Institutional Governance & Admissions</span>
-              </div>
-            </button>
+      {/* ── Off-canvas backdrop (mobile) ── */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-slate-950/70 backdrop-blur-sm lg:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
+      {/* ── Left Sidebar ── */}
+      <aside
+        className={`
+          fixed top-0 left-0 h-full w-64 z-50 bg-slate-900 border-r border-slate-800
+          transform transition-transform duration-300 ease-in-out
+          lg:static lg:translate-x-0 lg:flex-shrink-0
+          ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+        `}
+      >
+        <SidebarContent />
+      </aside>
+
+      {/* ── Main Area ── */}
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+
+        {/* Mobile top bar */}
+        <header className="lg:hidden flex items-center justify-between px-4 py-3 bg-slate-900 border-b border-slate-800 flex-shrink-0">
+          <button
+            onClick={() => setSidebarOpen(true)}
+            className="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition cursor-pointer"
+            aria-label="Open navigation menu"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+          <div className="flex items-center gap-2">
+            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center font-black text-sm text-white">B</div>
+            <span className="font-extrabold text-sm text-white">Admin Panel</span>
           </div>
+          <button
+            onClick={onLogout}
+            className="p-2 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-rose-950/40 transition cursor-pointer"
+            title="Sign Out"
+          >
+            <LogOut className="w-4 h-4" />
+          </button>
+        </header>
 
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => navigate('/')}
-              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-semibold border border-slate-700 transition cursor-pointer"
-            >
-              <ExternalLink className="w-3.5 h-3.5" />
-              <span>View Live Website</span>
-            </button>
+        {/* Scrollable content */}
+        <main className="flex-1 overflow-y-auto">
+          <div className="p-6 lg:p-8 space-y-8">
 
-            <button
-              onClick={onOpenApiSettings}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-semibold border border-slate-700 transition cursor-pointer"
-            >
-              <SlidersHorizontal className="w-3.5 h-3.5 text-blue-400" />
-              <span className="hidden md:inline">API Config</span>
-            </button>
-
-            <div className="h-6 w-px bg-slate-800 hidden sm:block" />
-
-            <div className="flex items-center gap-2 pl-1">
-              <img
-                src={currentUser?.avatar || 'https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=400&q=80'}
-                alt="User"
-                className="w-8 h-8 rounded-full object-cover border border-slate-700"
-              />
-              <span className="text-xs font-bold text-slate-200 hidden md:inline">
-                {currentUser?.name || 'Administrator'}
-              </span>
-              <button
-                onClick={onLogout}
-                className="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-rose-950/40 transition cursor-pointer"
-                title="Sign Out"
-              >
-                <LogOut className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      {/* Main Content Layout */}
-      <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 flex-1 space-y-8">
         
         {/* Metric Overview Cards */}
         <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-5 gap-4">
@@ -536,99 +638,6 @@ export const AdminDashboard = ({
             </div>
             <span className="text-[11px] text-slate-400 font-semibold mt-2 block">Articles & gallery</span>
           </div>
-        </div>
-
-        {/* Tab Navigation Controls */}
-        <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-2 border-b border-slate-800">
-          <button
-            onClick={() => setActiveTab('students')}
-            className={`flex items-center gap-2 px-5 py-3 rounded-xl font-bold text-sm transition cursor-pointer shrink-0 ${
-              activeTab === 'students'
-                ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30'
-                : 'bg-slate-900 text-slate-400 hover:text-white hover:bg-slate-800'
-            }`}
-          >
-            <GraduationCap className="w-4 h-4" />
-            <span>Enrolled Students & Inscriptions</span>
-            <span className="px-2 py-0.5 rounded-full text-xs bg-slate-950/60 text-blue-200">
-              {inscriptions.length}
-            </span>
-          </button>
-
-          <button
-            onClick={() => setActiveTab('campaigns')}
-            className={`flex items-center gap-2 px-5 py-3 rounded-xl font-bold text-sm transition cursor-pointer shrink-0 ${
-              activeTab === 'campaigns'
-                ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30'
-                : 'bg-slate-900 text-slate-400 hover:text-white hover:bg-slate-800'
-            }`}
-          >
-            <Megaphone className="w-4 h-4" />
-            <span>Campaigns & Admissions</span>
-            <span className="px-2 py-0.5 rounded-full text-xs bg-slate-950/60 text-blue-200">
-              {campaigns.length}
-            </span>
-          </button>
-
-          <button
-            onClick={() => setActiveTab('posts')}
-            className={`flex items-center gap-2 px-5 py-3 rounded-xl font-bold text-sm transition cursor-pointer shrink-0 ${
-              activeTab === 'posts'
-                ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30'
-                : 'bg-slate-900 text-slate-400 hover:text-white hover:bg-slate-800'
-            }`}
-          >
-            <FileText className="w-4 h-4" />
-            <span>Articles & News Posts</span>
-            <span className="px-2 py-0.5 rounded-full text-xs bg-slate-950/60 text-blue-200">
-              {posts.length}
-            </span>
-          </button>
-
-          <button
-            onClick={() => setActiveTab('volets')}
-            className={`flex items-center gap-2 px-5 py-3 rounded-xl font-bold text-sm transition cursor-pointer shrink-0 ${
-              activeTab === 'volets'
-                ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30'
-                : 'bg-slate-900 text-slate-400 hover:text-white hover:bg-slate-800'
-            }`}
-          >
-            <Layers className="w-4 h-4" />
-            <span>Volets & Activities</span>
-            <span className="px-2 py-0.5 rounded-full text-xs bg-slate-950/60 text-blue-200">
-              {volets.length}
-            </span>
-          </button>
-
-          <button
-            onClick={() => setActiveTab('partners')}
-            className={`flex items-center gap-2 px-5 py-3 rounded-xl font-bold text-sm transition cursor-pointer shrink-0 ${
-              activeTab === 'partners'
-                ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30'
-                : 'bg-slate-900 text-slate-400 hover:text-white hover:bg-slate-800'
-            }`}
-          >
-            <Building2 className="w-4 h-4" />
-            <span>Partners</span>
-            <span className="px-2 py-0.5 rounded-full text-xs bg-slate-950/60 text-blue-200">
-              {partners.length}
-            </span>
-          </button>
-
-          <button
-            onClick={() => setActiveTab('members')}
-            className={`flex items-center gap-2 px-5 py-3 rounded-xl font-bold text-sm transition cursor-pointer shrink-0 ${
-              activeTab === 'members'
-                ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30'
-                : 'bg-slate-900 text-slate-400 hover:text-white hover:bg-slate-800'
-            }`}
-          >
-            <Users className="w-4 h-4" />
-            <span>Staff Members</span>
-            <span className="px-2 py-0.5 rounded-full text-xs bg-slate-950/60 text-blue-200">
-              {members.length}
-            </span>
-          </button>
         </div>
 
         {/* TAB 1: ENROLLED STUDENTS & INSCRIPTIONS */}
@@ -1244,7 +1253,9 @@ export const AdminDashboard = ({
             </div>
           </div>
         )}
-      </div>
+          </div>
+          </main>
+        </div>
 
       {/* MODAL 1: VIEW STUDENT FULL DOSSIER */}
       {viewingStudentDossier && (
