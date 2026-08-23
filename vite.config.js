@@ -45,14 +45,29 @@ export default defineConfig(() => {
     build: {
       outDir,
       emptyOutDir: false,   // ← disabled; our plugin handles selective cleanup
+      chunkSizeWarningLimit: 600,
       rollupOptions: {
         input: {
           main: path.resolve(__dirname, 'index.html'),
         },
         output: {
           entryFileNames: 'assets/[name].js',
-          chunkFileNames: 'assets/[name].js',
+          chunkFileNames: 'assets/[name]-[hash].js',
           assetFileNames: 'assets/[name].[ext]',
+          manualChunks(id) {
+            if (id.includes('node_modules')) {
+              if (id.includes('react') || id.includes('react-dom') || id.includes('react-router')) {
+                return 'vendor-react';
+              }
+              if (id.includes('lucide-react')) {
+                return 'vendor-icons';
+              }
+              if (id.includes('aos')) {
+                return 'vendor-utils';
+              }
+              return 'vendor';
+            }
+          }
         },
       },
     },

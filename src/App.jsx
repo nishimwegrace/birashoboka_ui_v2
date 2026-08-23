@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { BrowserRouter, Routes, Route, useNavigate, useLocation, useParams } from 'react-router-dom';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
@@ -15,12 +15,14 @@ import { GalleryPage } from './pages/GalleryPage.jsx';
 import { PartnersPage } from './pages/PartnersPage.jsx';
 import { ContactPage } from './pages/ContactPage.jsx';
 import { ApplyPage } from './pages/ApplyPage.jsx';
-import { AdminDashboard } from './pages/AdminDashboard.jsx';
-import { AdminLoginPage } from './pages/AdminLoginPage.jsx';
 import { ApiService, getStoredUser, setStoredUser } from './services/api.js';
 import { SEED_VOLETS, SEED_ACTIVITIES, SEED_POSTS, SEED_PARTNERS, SEED_TESTIMONIALS, 
   SEED_CAMPAIGNS, SEED_MEMBERS, SEED_STUDENTS, SEED_INSCRIPTIONS 
 } from './data/seedData.js';
+
+// Lazy load heavy admin components for website performance
+const AdminDashboard = lazy(() => import('./pages/AdminDashboard.jsx').then(m => ({ default: m.AdminDashboard })));
+const AdminLoginPage = lazy(() => import('./pages/AdminLoginPage.jsx').then(m => ({ default: m.AdminLoginPage })));
 
 function AppContent() {
   const routerNavigate = useNavigate();
@@ -147,7 +149,12 @@ function AppContent() {
 
       {/* Main Dynamic View */}
       <main className="flex-1 w-full">
-        <Routes>
+        <Suspense fallback={
+          <div className="min-h-[50vh] flex items-center justify-center p-12">
+            <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+          </div>
+        }>
+          <Routes>
           <Route path="/" element={
             <HomePage
               posts={posts}
@@ -322,6 +329,7 @@ function AppContent() {
             />
           } />
         </Routes>
+        </Suspense>
       </main>
 
       {/* Footer */}
