@@ -49,7 +49,7 @@ export const LatestNewsSection = ({ posts, navigate }) => {
                 {/* Image Wrap */}
                 <div className="relative aspect-16/10 overflow-hidden bg-slate-100">
                   <img
-                    src={post.featured_image || 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=800&q=80'}
+                    src={post.featured_image }
                     alt={post.title}
                     loading="lazy"
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"

@@ -69,8 +69,8 @@ export const HomePage = ({
         <GallerySection posts={posts} navigate={navigate} isFullPage={false} />
       </div>
 
-      {/* VIII. Contact Section */}
-      <div data-aos="fade-up" data-aos-duration="700">
+      {/* VIII. Contact Section (Displayed right before Footer) */}
+      <div data-aos="fade-up" data-aos-duration="700" className="border-t border-slate-200">
         <ContactSection navigate={navigate} isFullPage={false} />
       </div>
     </div>
