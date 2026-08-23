@@ -38,6 +38,18 @@ export function setStoredAuthToken(token) {
   }
 }
 
+export function formatImageUrl(url) {
+  if (!url || typeof url !== 'string') return '';
+  if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:')) {
+    return url;
+  }
+  const baseUrl = getStoredApiBaseUrl();
+  const cleanBase = baseUrl.replace(/\/+$/, '');
+  const cleanPath = url.replace(/^\/+/, '');
+  const fullPath = cleanPath.startsWith('uploads/') ? `storage/${cleanPath}` : cleanPath;
+  return cleanBase ? `${cleanBase}/${fullPath}` : `/${fullPath}`;
+}
+
 // Fetch helper with timeout & fallback
 async function fetchWithFallback(endpoint, fallbackData, options) {
   const baseUrl = getStoredApiBaseUrl();
@@ -153,12 +165,17 @@ export const ApiService = {
     const items = Array.isArray(res.data) ? res.data : (res.data?.items || filteredSeed);
     
     // Enrich with volet and default image if missing
-    const enriched = items.map((p, idx) => ({
-      ...p,
-      featured_image: p.featured_image || SEED_POSTS[idx % SEED_POSTS.length]?.featured_image,
-      image_urls: p.image_urls && p.image_urls.length > 0 ? p.image_urls : [p.featured_image || SEED_POSTS[idx % SEED_POSTS.length]?.featured_image || ''],
-      volet: p.volet || SEED_VOLETS.find(v => v.id === p.volet_id)
-    }));
+    const enriched = items.map((p, idx) => {
+      const featImg = formatImageUrl(p.featured_image) || SEED_POSTS[idx % SEED_POSTS.length]?.featured_image;
+      const rawGallery = p.image_urls && p.image_urls.length > 0 ? p.image_urls : [p.featured_image || ''];
+      const gallery = rawGallery.map(img => formatImageUrl(img)).filter(Boolean);
+      return {
+        ...p,
+        featured_image: featImg,
+        image_urls: gallery.length > 0 ? gallery : [featImg],
+        volet: p.volet || SEED_VOLETS.find(v => v.id === p.volet_id)
+      };
+    });
 
     const pagination = (!Array.isArray(res.data) && res.data?.pagination) ? res.data.pagination : {
       page,
@@ -176,10 +193,14 @@ export const ApiService = {
     if (!res.data) return { data: null, isLive: res.isLive };
 
     const post = { ...res.data };
-    post.featured_image = post.featured_image || local?.featured_image || SEED_POSTS[0].featured_image;
-    post.image_urls = (post.image_urls && post.image_urls.length > 0) 
+    const featImg = formatImageUrl(post.featured_image) || local?.featured_image || SEED_POSTS[0].featured_image;
+    const rawGallery = (post.image_urls && post.image_urls.length > 0) 
       ? post.image_urls 
       : (local?.image_urls || [post.featured_image || '']);
+    const gallery = rawGallery.map(img => formatImageUrl(img)).filter(Boolean);
+
+    post.featured_image = featImg;
+    post.image_urls = gallery.length > 0 ? gallery : [featImg];
     post.volet = post.volet || SEED_VOLETS.find(v => v.id === post.volet_id);
 
     return { data: post, isLive: res.isLive };
@@ -211,7 +232,7 @@ export const ApiService = {
     const items = Array.isArray(res.data) ? res.data : (res.data?.items || SEED_PARTNERS);
     const enriched = items.map((p, i) => ({
       ...p,
-      logo: p.logo || SEED_PARTNERS[i % SEED_PARTNERS.length]?.logo,
+      logo: formatImageUrl(p.logo) || SEED_PARTNERS[i % SEED_PARTNERS.length]?.logo,
       type: p.type || SEED_PARTNERS[i % SEED_PARTNERS.length]?.type || 'Partner Organization',
       volet: p.volet || SEED_VOLETS.find(v => v.id === p.volet_id)
     }));
@@ -229,7 +250,7 @@ export const ApiService = {
     const items = Array.isArray(res.data) ? res.data : (res.data?.items || SEED_TESTIMONIALS);
     const enriched = items.map((t, i) => ({
       ...t,
-      photo: t.photo || SEED_TESTIMONIALS[i % SEED_TESTIMONIALS.length]?.photo,
+      photo: formatImageUrl(t.photo) || SEED_TESTIMONIALS[i % SEED_TESTIMONIALS.length]?.photo,
       role: t.role || SEED_TESTIMONIALS[i % SEED_TESTIMONIALS.length]?.role,
       rating: t.rating || 5
     }));
@@ -261,7 +282,13 @@ export const ApiService = {
       pagination: { page: 1, per_page: 50, total: SEED_MEMBERS.length, last_page: 1 }
     });
     const items = Array.isArray(res.data) ? res.data : (res.data?.items || SEED_MEMBERS);
-    return { items, isLive: res.isLive };
+    const enriched = items.map((m, i) => ({
+      ...m,
+      avatar: formatImageUrl(m.avatar) || SEED_MEMBERS[i % SEED_MEMBERS.length]?.avatar,
+      bio: m.bio || '',
+      position: m.position || 'Team Member'
+    }));
+    return { items: enriched, isLive: res.isLive };
   },
 
   // Students & Inscriptions
@@ -490,7 +517,18 @@ export const ApiService = {
       const json = await response.json();
 
       if (response.ok && json.data) {
-        return { success: true, post: json.data, message: json.message };
+        const featImg = formatImageUrl(json.data.featured_image) || postData.featured_image;
+        const rawGallery = (json.data.image_urls && json.data.image_urls.length > 0)
+          ? json.data.image_urls
+          : [json.data.featured_image || ''];
+        const gallery = rawGallery.map(img => formatImageUrl(img)).filter(Boolean);
+
+        const savedPost = {
+          ...json.data,
+          featured_image: featImg,
+          image_urls: gallery.length > 0 ? gallery : [featImg]
+        };
+        return { success: true, post: savedPost, message: json.message };
       }
       if (json.message) return { success: false, message: json.message };
     } catch {
@@ -622,7 +660,11 @@ export const ApiService = {
       const response = await fetch(url, { method, headers, body });
       const json = await response.json();
       if (response.ok && json.data) {
-        return { success: true, partner: json.data };
+        const savedPartner = {
+          ...json.data,
+          logo: formatImageUrl(json.data.logo) || partner.logo
+        };
+        return { success: true, partner: savedPartner };
       }
     } catch {
       // Fallback
@@ -782,7 +824,11 @@ export const ApiService = {
       const response = await fetch(url, { method, headers, body });
       const json = await response.json();
       if (response.ok && json.data) {
-        return { success: true, member: json.data };
+        const savedMember = {
+          ...json.data,
+          avatar: formatImageUrl(json.data.avatar) || member.avatar
+        };
+        return { success: true, member: savedMember };
       }
     } catch {
       // Fallback
