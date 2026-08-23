@@ -30,7 +30,9 @@ import {
   ChevronRight,
   TrendingUp,
   Settings,
-  AlertCircle
+  AlertCircle,
+  MessageSquare,
+  Star
 } from 'lucide-react';
 import { ApiService } from '../services/api.js';
 
@@ -44,6 +46,7 @@ export const AdminDashboard = ({
   activities,
   partners,
   members,
+  testimonials = [],
   onUpdateStudents,
   onUpdateInscriptions,
   onUpdateCampaigns,
@@ -52,6 +55,7 @@ export const AdminDashboard = ({
   onUpdateActivities,
   onUpdatePartners,
   onUpdateMembers,
+  onUpdateTestimonials,
   onLogout,
   navigate,
   onOpenApiSettings
@@ -94,6 +98,11 @@ export const AdminDashboard = ({
   const [editingMember, setEditingMember] = useState(null);
   const [memberAvatarFile, setMemberAvatarFile] = useState(null);
 
+  // Testimonial modal
+  const [testimonialModalOpen, setTestimonialModalOpen] = useState(false);
+  const [editingTestimonial, setEditingTestimonial] = useState(null);
+  const [testimonialPhotoFile, setTestimonialPhotoFile] = useState(null);
+
   // Success toast message
   const [notification, setNotification] = useState(null);
 
@@ -104,12 +113,13 @@ export const AdminDashboard = ({
 
   // Sidebar nav items
   const navItems = [
-    { key: 'students',  label: 'Enrollment',  icon: GraduationCap, count: inscriptions.length },
-    { key: 'campaigns', label: 'Campaigns',   icon: Megaphone,      count: campaigns.length },
-    { key: 'posts',     label: 'Articles',    icon: FileText,       count: posts.length },
-    { key: 'volets',    label: 'Volet',       icon: Layers,         count: volets.length },
-    { key: 'partners',  label: 'Partners',    icon: Building2,      count: partners.length },
-    { key: 'members',   label: 'Team',        icon: Users,          count: members.length },
+    { key: 'students',     label: 'Enrollment',   icon: GraduationCap, count: inscriptions.length },
+    { key: 'campaigns',    label: 'Campaigns',    icon: Megaphone,      count: campaigns.length },
+    { key: 'posts',        label: 'Articles',     icon: FileText,       count: posts.length },
+    { key: 'volets',       label: 'Volet',        icon: Layers,         count: volets.length },
+    { key: 'partners',     label: 'Partners',     icon: Building2,      count: partners.length },
+    { key: 'members',      label: 'Team',         icon: Users,          count: members.length },
+    { key: 'testimonials', label: 'Testimonials', icon: MessageSquare,  count: testimonials.length },
   ];
 
   const handleNavClick = (key) => {
@@ -417,6 +427,35 @@ export const AdminDashboard = ({
       onUpdateMembers(members.filter(m => m.id !== id));
       showNotification('Team member removed.');
       await ApiService.deleteMember(id);
+    }
+  };
+
+  // Save Testimonial
+  const handleSaveTestimonial = async (e) => {
+    e.preventDefault();
+    if (!editingTestimonial?.name || !editingTestimonial?.content) return;
+
+    const files = { photo: testimonialPhotoFile };
+    const res = await ApiService.saveTestimonial(editingTestimonial, files);
+    const saved = res.testimonial || editingTestimonial;
+
+    if (editingTestimonial.id) {
+      onUpdateTestimonials(testimonials.map(t => t.id === editingTestimonial.id ? { ...t, ...saved } : t));
+      showNotification('Testimonial updated!');
+    } else {
+      onUpdateTestimonials([...testimonials, saved]);
+      showNotification('New testimonial added!');
+    }
+    setTestimonialModalOpen(false);
+    setEditingTestimonial(null);
+    setTestimonialPhotoFile(null);
+  };
+
+  const handleDeleteTestimonial = async (id) => {
+    if (window.confirm('Delete this testimonial?')) {
+      onUpdateTestimonials(testimonials.filter(t => t.id !== id));
+      showNotification('Testimonial deleted.');
+      await ApiService.deleteTestimonial(id);
     }
   };
 
@@ -1274,9 +1313,103 @@ export const AdminDashboard = ({
             </div>
           </div>
         )}
+
+        {/* TESTIMONIALS TAB */}
+        {activeTab === 'testimonials' && (
+          <div className="space-y-6">
+            {/* Header */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between bg-white p-5 rounded-2xl border border-slate-200 shadow-sm gap-4">
+              <div>
+                <h3 className="text-lg font-bold text-slate-900">Testimonials</h3>
+                <p className="text-xs text-slate-500">{testimonials.length} testimonial{testimonials.length !== 1 ? 's' : ''} from program participants</p>
+              </div>
+              <button
+                onClick={() => {
+                  setEditingTestimonial({ rating: 5 });
+                  setTestimonialPhotoFile(null);
+                  setTestimonialModalOpen(true);
+                }}
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-md shadow-blue-600/20 transition cursor-pointer"
+              >
+                <Plus className="w-4 h-4" />
+                <span>Add Testimonial</span>
+              </button>
+            </div>
+
+            {/* Grid of testimonial cards */}
+            {testimonials.length === 0 ? (
+              <div className="bg-white rounded-2xl p-12 text-center border border-slate-200 shadow-sm">
+                <MessageSquare className="w-12 h-12 text-slate-300 mx-auto mb-3" />
+                <p className="text-slate-500 font-medium">No testimonials yet. Add the first one above.</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+                {testimonials.map((t) => (
+                  <div key={t.id} className="bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition overflow-hidden flex flex-col">
+                    {/* Top: photo + name + role */}
+                    <div className="p-5 flex items-start gap-4">
+                      <div className="shrink-0">
+                        {t.photo ? (
+                          <img
+                            src={t.photo}
+                            alt={t.name}
+                            className="w-14 h-14 rounded-xl object-cover border border-slate-200 bg-slate-50"
+                          />
+                        ) : (
+                          <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-blue-100 to-indigo-100 border border-blue-200 flex items-center justify-center">
+                            <Users className="w-6 h-6 text-blue-400" />
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-bold text-slate-900 text-sm truncate">{t.name}</p>
+                        {t.role && <p className="text-xs text-blue-600 font-semibold truncate">{t.role}</p>}
+                        {/* Stars */}
+                        <div className="flex items-center gap-0.5 mt-1">
+                          {[1,2,3,4,5].map(i => (
+                            <Star key={i} className={`w-3 h-3 ${i <= (t.rating || 5) ? 'text-amber-400 fill-amber-400' : 'text-slate-200 fill-slate-200'}`} />
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Content */}
+                    <div className="px-5 pb-4 flex-1">
+                      <p className="text-xs text-slate-600 leading-relaxed line-clamp-4 italic">
+                        "{t.content}"
+                      </p>
+                    </div>
+
+                    {/* Actions */}
+                    <div className="px-5 py-3 border-t border-slate-100 flex justify-end gap-2 bg-slate-50/60">
+                      <button
+                        onClick={() => {
+                          setEditingTestimonial({ ...t });
+                          setTestimonialPhotoFile(null);
+                          setTestimonialModalOpen(true);
+                        }}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white hover:bg-slate-100 text-slate-800 text-xs font-bold transition cursor-pointer border border-slate-200"
+                      >
+                        <Edit3 className="w-3.5 h-3.5" />
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => handleDeleteTestimonial(t.id)}
+                        className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-bold transition cursor-pointer border border-rose-200"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
-          </main>
+        )}
         </div>
+        </main>
+      </div>
 
       {/* MODAL 1: VIEW STUDENT FULL DOSSIER */}
       {viewingStudentDossier && (
@@ -2158,6 +2291,128 @@ export const AdminDashboard = ({
                 className="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold cursor-pointer shadow-md shadow-blue-600/20"
               >
                 Save Member
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
+
+      {/* MODAL 9: CREATE / EDIT TESTIMONIAL */}
+      {testimonialModalOpen && editingTestimonial && (
+        <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+          <form onSubmit={handleSaveTestimonial} className="bg-white rounded-3xl max-w-lg w-full border border-slate-200 shadow-2xl p-6 sm:p-8 space-y-4 animate-in zoom-in-95 text-slate-900">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-200">
+              <h3 className="text-xl font-extrabold text-slate-900">
+                {editingTestimonial.id ? 'Edit Testimonial' : 'Add Testimonial'}
+              </h3>
+              <button type="button" onClick={() => setTestimonialModalOpen(false)} className="text-slate-400 hover:text-slate-900">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Author Name *</label>
+              <input
+                type="text"
+                value={editingTestimonial.name || ''}
+                onChange={(e) => setEditingTestimonial({ ...editingTestimonial, name: e.target.value })}
+                required
+                placeholder="e.g. Marie Kwizera"
+                className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-300 text-slate-900 text-sm font-bold focus:bg-white focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Role / Status</label>
+                <input
+                  type="text"
+                  value={editingTestimonial.role || ''}
+                  onChange={(e) => setEditingTestimonial({ ...editingTestimonial, role: e.target.value })}
+                  placeholder="e.g. Graduate Trainee - Couture"
+                  className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-300 text-slate-900 text-sm focus:bg-white focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Rating (1-5 Stars)</label>
+                <select
+                  value={editingTestimonial.rating || 5}
+                  onChange={(e) => setEditingTestimonial({ ...editingTestimonial, rating: Number(e.target.value) })}
+                  className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-300 text-slate-900 text-sm font-bold focus:bg-white focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value={5}>5 Stars ★★★★★</option>
+                  <option value={4}>4 Stars ★★★★☆</option>
+                  <option value={3}>3 Stars ★★★☆☆</option>
+                  <option value={2}>2 Stars ★★☆☆☆</option>
+                  <option value={1}>1 Star ★☆☆☆☆</option>
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Associated Activity / Course (Optional)</label>
+              <select
+                value={editingTestimonial.activity_id || ''}
+                onChange={(e) => setEditingTestimonial({ 
+                  ...editingTestimonial, 
+                  activity_id: e.target.value ? Number(e.target.value) : null 
+                })}
+                className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-300 text-slate-900 text-sm font-medium focus:bg-white focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="">General Program Testimonial</option>
+                {activities.map(a => (
+                  <option key={a.id} value={a.id}>
+                    {a.title}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Photo (Upload Image)</label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => {
+                  if (e.target.files && e.target.files[0]) {
+                    setTestimonialPhotoFile(e.target.files[0]);
+                  }
+                }}
+                className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-300 text-slate-900 text-xs file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700 cursor-pointer"
+              />
+              {editingTestimonial.photo && typeof editingTestimonial.photo === 'string' && (
+                <div className="mt-1 text-[11px] text-slate-500 truncate">
+                  Current photo: <span className="text-slate-800 font-medium">{editingTestimonial.photo}</span>
+                </div>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Testimonial Content *</label>
+              <textarea
+                rows={4}
+                required
+                value={editingTestimonial.content || ''}
+                onChange={(e) => setEditingTestimonial({ ...editingTestimonial, content: e.target.value })}
+                placeholder="Write the full testimonial text here..."
+                className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-300 text-slate-900 text-sm leading-relaxed focus:bg-white focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            <div className="flex justify-end gap-3 pt-3">
+              <button
+                type="button"
+                onClick={() => setTestimonialModalOpen(false)}
+                className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold border border-slate-200"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold cursor-pointer shadow-md shadow-blue-600/20"
+              >
+                Save Testimonial
               </button>
             </div>
           </form>

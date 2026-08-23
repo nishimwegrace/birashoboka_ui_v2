@@ -9,7 +9,7 @@ import {
   ShieldCheck,
   Award
 } from 'lucide-react';
-
+import ceo from '../assets/ceo.jpg';
 export const AboutHomeSection = ({
   navigate,
   partnersCount,
@@ -26,8 +26,8 @@ export const AboutHomeSection = ({
           <div className="lg:col-span-5 relative">
             <div className="relative rounded-3xl overflow-hidden shadow-2xl border-4 border-white bg-slate-100 aspect-4/3 lg:aspect-5/4 group">
               <img
-                src="https://images.unsplash.com/photo-1531206715517-5c0ba140b2b8?auto=format&fit=crop&w=1000&q=80"
-                alt="Birashoboka Vocational Training in Burundi"
+                src={ceo}
+                alt="Birashoboka"
                 className="w-full h-full object-cover group-hover:scale-103 transition-transform duration-700"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-slate-900/70 via-transparent to-transparent" />
@@ -44,7 +44,7 @@ export const AboutHomeSection = ({
                   </div>
                 </div>
                 <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
-                  Active in Ngozi & Bujumbura
+                  Ngozi & Bujumbura
                 </span>
               </div>
             </div>

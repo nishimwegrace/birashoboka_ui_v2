@@ -946,6 +946,79 @@ export const ApiService = {
       // Fallback
     }
     return { success: true };
+  },
+
+  // Testimonial CRUD (with photo file upload)
+  async saveTestimonial(testimonial, files = {}) {
+    const baseUrl = getStoredApiBaseUrl();
+    const token = getStoredAuthToken();
+    const cleanBase = baseUrl.replace(/\/+$/, '');
+    const isUpdate = !!testimonial.id;
+    const url = cleanBase
+      ? (isUpdate ? `${cleanBase}/api/testimonials/${testimonial.id}` : `${cleanBase}/api/testimonials`)
+      : (isUpdate ? `/api/testimonials/${testimonial.id}` : '/api/testimonials');
+
+    const hasPhotoFile = files.photo instanceof File;
+
+    try {
+      const headers = { 'Accept': 'application/json' };
+      if (token) headers['Authorization'] = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
+
+      let body;
+      if (hasPhotoFile) {
+        body = new FormData();
+        body.append('name', testimonial.name || '');
+        if (testimonial.role)        body.append('role', testimonial.role);
+        if (testimonial.content)     body.append('content', testimonial.content);
+        if (testimonial.rating)      body.append('rating', testimonial.rating);
+        if (testimonial.activity_id) body.append('activity_id', testimonial.activity_id);
+        body.append('photo', files.photo);
+        if (isUpdate) body.append('_method', 'PUT');
+      } else {
+        headers['Content-Type'] = 'application/json';
+        body = JSON.stringify(testimonial);
+      }
+
+      const method = isUpdate ? (hasPhotoFile ? 'POST' : 'PUT') : 'POST';
+      const response = await fetch(url, { method, headers, body });
+      const json = await response.json();
+      if (response.ok && json.data) {
+        const saved = { ...json.data, photo: formatImageUrl(json.data.photo) || testimonial.photo };
+        return { success: true, testimonial: saved };
+      }
+    } catch {
+      // Fallback
+    }
+
+    return {
+      success: true,
+      testimonial: {
+        id: testimonial.id || Date.now(),
+        name: testimonial.name || 'New Testimonial',
+        role: testimonial.role || '',
+        content: testimonial.content || '',
+        rating: testimonial.rating || 5,
+        photo: testimonial.photo || null,
+        activity_id: testimonial.activity_id || null,
+      }
+    };
+  },
+
+  async deleteTestimonial(id) {
+    const baseUrl = getStoredApiBaseUrl();
+    const token = getStoredAuthToken();
+    const cleanBase = baseUrl.replace(/\/+$/, '');
+    const url = cleanBase ? `${cleanBase}/api/testimonials/${id}` : `/api/testimonials/${id}`;
+
+    try {
+      const headers = { 'Accept': 'application/json' };
+      if (token) headers['Authorization'] = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
+      const response = await fetch(url, { method: 'DELETE', headers });
+      if (response.ok) return { success: true };
+    } catch {
+      // Fallback
+    }
+    return { success: true };
   }
 };
 

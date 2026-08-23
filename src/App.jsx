@@ -191,6 +191,7 @@ export function App() {
           activities={activities}
           partners={partners}
           members={members}
+          testimonials={testimonials}
           onUpdateStudents={setStudents}
           onUpdateInscriptions={setInscriptions}
           onUpdateCampaigns={setCampaigns}
@@ -199,6 +200,7 @@ export function App() {
           onUpdateActivities={setActivities}
           onUpdatePartners={setPartners}
           onUpdateMembers={setMembers}
+          onUpdateTestimonials={setTestimonials}
           onLogout={() => setCurrentUser(null)}
           navigate={navigate}
           onOpenApiSettings={() => setIsSettingsOpen(true)}
