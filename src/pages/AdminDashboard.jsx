@@ -1659,7 +1659,7 @@ export const AdminDashboard = ({
               <div>
                 <label className="block text-xs font-bold text-blue-600 uppercase mb-1">Program (Volet) *</label>
                 <select
-                  value={editingCampaign.volet_id || 1}
+                  value={editingCampaign.volet_id}
                   onChange={(e) => {
                     const newVoletId = Number(e.target.value);
                     setEditingCampaign({
@@ -1668,8 +1668,10 @@ export const AdminDashboard = ({
                       activity_id: null
                     });
                   }}
+                  required
                   className="w-full px-3 py-2 rounded-xl bg-white border border-slate-300 text-slate-900 text-sm font-semibold focus:ring-2 focus:ring-blue-500"
                 >
+                  <option value="">---Select Program---</option>
                   {volets.map(v => (
                     <option key={v.id} value={v.id}>{v.name} ({v.target === 'women' ? 'Women' : 'General'})</option>
                   ))}
@@ -1687,9 +1689,10 @@ export const AdminDashboard = ({
                       activity_id: val
                     });
                   }}
+                  required
                   className="w-full px-3 py-2 rounded-xl bg-white border border-slate-300 text-slate-900 text-sm font-semibold focus:ring-2 focus:ring-blue-500"
                 >
-                  <option value="">All Trades in this Volet</option>
+                  <option value="">---Select Activity---</option>
                   {activities
                     .filter(a => a.volet_id === (editingCampaign.volet_id || 1))
                     .map(act => (
