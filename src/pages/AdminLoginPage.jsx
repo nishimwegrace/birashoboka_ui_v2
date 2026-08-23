@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Lock, Mail, ShieldCheck, ArrowRight, Sparkles, Building2, UserCheck, AlertCircle } from 'lucide-react';
+import { Lock, Mail, ShieldCheck, ArrowRight,  Building2, UserCheck, AlertCircle } from 'lucide-react';
 import { ApiService } from '../services/api.js';
 
 export const AdminLoginPage = ({ onLogin, navigate }) => {
@@ -98,7 +98,6 @@ export const AdminLoginPage = ({ onLogin, navigate }) => {
         {/* Instant Access Banner for Testing */}
         <div className="p-4 rounded-2xl bg-blue-50 border border-blue-200 text-blue-900 text-xs space-y-2">
           <div className="flex items-center gap-2 font-bold text-blue-900">
-            <Sparkles className="w-4 h-4 text-amber-600" />
             <span>Test Mode / Open Access Active</span>
           </div>
           <p className="text-slate-600 leading-relaxed">

@@ -4,7 +4,7 @@ import {
   MapPin, 
   Users, 
   ArrowRight, 
-  Sparkles, 
+   
   CheckCircle2, 
   ShieldCheck 
 } from 'lucide-react';
@@ -140,7 +140,6 @@ export const ProgramsPage = ({
             {activities.map((act) => (
               <div key={act.id} className="p-4 rounded-2xl bg-slate-50 border border-slate-100 flex items-start gap-3">
                 <div className="w-9 h-9 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center shrink-0 mt-0.5">
-                  <Sparkles className="w-4 h-4" />
                 </div>
                 <div>
                   <h4 className="font-bold text-slate-900 text-sm">{act.title}</h4>

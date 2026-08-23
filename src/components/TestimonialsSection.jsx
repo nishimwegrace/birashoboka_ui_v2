@@ -1,5 +1,5 @@
 import React from 'react';
-import { Quote, Star, Sparkles, CheckCircle2 } from 'lucide-react';
+import { Quote, Star,  CheckCircle2 } from 'lucide-react';
 
 export const TestimonialsSection = ({ testimonials, navigate }) => {
   return (
@@ -9,7 +9,6 @@ export const TestimonialsSection = ({ testimonials, navigate }) => {
         {/* Header */}
         <div className="text-center max-w-2xl mx-auto mb-14">
           <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-bold uppercase tracking-wider border border-blue-200">
-            <Sparkles className="w-3.5 h-3.5" />
             Voices of Transformation
           </span>
           <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight mt-3">

@@ -5,7 +5,7 @@ import {
   Share2, 
   Check, 
   MapPin, 
-  Sparkles, 
+   
   Clock, 
   ChevronRight,
   ArrowRight,
@@ -198,7 +198,6 @@ export const PostDetailPage = ({
             <div className="bg-white rounded-3xl p-6 border border-slate-200/90 shadow-sm space-y-5">
               <div className="flex items-center justify-between pb-3 border-b border-slate-100">
                 <div className="flex items-center gap-2">
-                  <Sparkles className="w-4 h-4 text-blue-600" />
                   <h3 className="font-extrabold text-base text-slate-900">
                     Related Stories
                   </h3>

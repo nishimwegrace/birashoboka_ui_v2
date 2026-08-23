@@ -1,5 +1,5 @@
 import React from 'react';
-import { Megaphone, ArrowRight, Calendar, Sparkles, X } from 'lucide-react';
+import { Megaphone, ArrowRight, Calendar,  X } from 'lucide-react';
 
 export const EnrollmentBanner = ({
   campaign,
@@ -67,7 +67,6 @@ export const EnrollmentBanner = ({
             onClick={() => navigate(applyPath)}
             className="flex-1 md:flex-none inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold text-xs uppercase tracking-wider shadow-lg shadow-amber-400/30 transition-transform active:scale-95 cursor-pointer"
           >
-            <Sparkles className="w-3.5 h-3.5 text-slate-950" />
             <span>Apply Online Now</span>
             <ArrowRight className="w-4 h-4 text-slate-950" />
           </button>

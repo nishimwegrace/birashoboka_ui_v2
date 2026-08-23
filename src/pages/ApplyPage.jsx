@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { 
   GraduationCap, 
-  Sparkles, 
+   
   CheckCircle2, 
   Building2, 
   Calendar, 
@@ -20,7 +20,8 @@ import {
   Clock,
   Briefcase,
   Layers,
-  ChevronRight
+  ChevronRight,
+  HomeIcon
 } from 'lucide-react';
 import { ApiService } from '../services/api.js';
 
@@ -198,7 +199,6 @@ export const ApplyPage = ({
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition">
             <div className="w-12 h-12 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center font-bold mb-4">
-              <Sparkles className="w-6 h-6" />
             </div>
             <h3 className="text-lg font-bold text-slate-900 mb-2">100% Free & Certified</h3>
             <p className="text-sm text-slate-600 leading-relaxed font-normal">
@@ -353,31 +353,12 @@ export const ApplyPage = ({
             </div>
 
             {/* Actions */}
-            <div className="flex flex-wrap items-center justify-center gap-4 pt-2">
-              <button
-                onClick={handlePrint}
-                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-sm shadow-md transition cursor-pointer"
-              >
-                <Printer className="w-4 h-4" />
-                <span>Print / Save Registration Card</span>
-              </button>
-
-              <button
-                onClick={() => {
-                  setSubmissionResult(null);
-                  setFullName('');
-                  setPhone('');
-                }}
-                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-sm transition cursor-pointer"
-              >
-                <span>Submit Another Application</span>
-              </button>
-
+            <div className="flex flex-wrap items-center justify-end gap-4 pt-2">
               <button
                 onClick={() => navigate('/')}
                 className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm transition cursor-pointer"
               >
-                <span>Return to Home</span>
+                <span><HomeIcon className="w-4 h-4" /> Return to Home</span>
               </button>
             </div>
           </div>

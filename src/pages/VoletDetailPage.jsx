@@ -6,7 +6,7 @@ import {
   Users, 
   Tag, 
   Calendar, 
-  Sparkles, 
+   
   CheckCircle2, 
   ArrowRight, 
   ArrowLeft,
@@ -197,7 +197,6 @@ export const VoletDetailPage = ({
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
               <div className="space-y-2">
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 text-xs font-bold uppercase tracking-wider">
-                  <Sparkles className="w-3.5 h-3.5" /> Admissions In Progress
                 </div>
                 <h3 className="text-2xl font-extrabold">{voletCampaigns[0].title}</h3>
                 <p className="text-xs sm:text-sm text-emerald-100 max-w-2xl">{voletCampaigns[0].description}</p>
@@ -237,7 +236,6 @@ export const VoletDetailPage = ({
               >
                 <div>
                   <div className="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mb-4">
-                    <Sparkles className="w-6 h-6" />
                   </div>
                   <h3 className="text-lg font-bold text-slate-900 leading-snug">
                     {act.title}

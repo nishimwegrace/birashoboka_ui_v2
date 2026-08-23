@@ -4,7 +4,7 @@ import {
   Eye, 
   Heart, 
   ShieldCheck, 
-  Sparkles, 
+  Sparkles,
   Users, 
   Award, 
   CheckCircle2, 

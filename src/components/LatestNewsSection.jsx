@@ -1,5 +1,5 @@
 import React from 'react';
-import { Calendar, ArrowRight, Sparkles, Tag } from 'lucide-react';
+import { Calendar, ArrowRight,  Tag } from 'lucide-react';
 
 export const LatestNewsSection = ({ posts, navigate }) => {
   // Show 10 latest posts
@@ -13,7 +13,6 @@ export const LatestNewsSection = ({ posts, navigate }) => {
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-4">
           <div>
             <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-bold uppercase tracking-wider border border-blue-200">
-              <Sparkles className="w-3.5 h-3.5" />
               Latest News & Field Updates
             </span>
             <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight mt-3">

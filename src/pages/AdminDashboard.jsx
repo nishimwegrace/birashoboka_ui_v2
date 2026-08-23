@@ -16,7 +16,7 @@ import {
   Search, 
   Filter, 
   Eye, 
-  Sparkles, 
+   
   Calendar, 
   MapPin, 
   Phone, 
@@ -1058,7 +1058,7 @@ export const AdminDashboard = ({
 
                 <button
                   onClick={() => {
-                    setEditingVolet({});
+                    setEditingVolet({ target: 'women', place: 'Ngozi & Bujumbura, Burundi' });
                     setVoletModalOpen(true);
                   }}
                   className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-md shadow-blue-600/20 transition cursor-pointer"
@@ -1841,6 +1841,33 @@ export const AdminDashboard = ({
               />
             </div>
 
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Target Group *</label>
+                <select
+                  value={editingVolet.target || 'women'}
+                  onChange={(e) => setEditingVolet({ ...editingVolet, target: e.target.value })}
+                  className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-300 text-slate-900 text-sm font-medium focus:bg-white focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="women">Women & Girls (CRBN)</option>
+                  <option value="all">Open to All (Lyricure)</option>
+                  <option value="young">Vulnerable Youth</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Location / Place *</label>
+                <input
+                  type="text"
+                  value={editingVolet.place || ''}
+                  onChange={(e) => setEditingVolet({ ...editingVolet, place: e.target.value })}
+                  placeholder="e.g. Ngozi & Bujumbura"
+                  required
+                  className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-300 text-slate-900 text-sm focus:bg-white focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+            </div>
+
             <div className="flex justify-end gap-3 pt-3">
               <button
                 type="button"
@@ -1876,10 +1903,12 @@ export const AdminDashboard = ({
             <div>
               <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Parent Volet *</label>
               <select
-                value={editingActivity.volet_id || 1}
+                value={editingActivity.volet_id}
                 onChange={(e) => setEditingActivity({ ...editingActivity, volet_id: Number(e.target.value) })}
+                required
                 className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-300 text-slate-900 text-sm font-medium focus:bg-white focus:ring-2 focus:ring-blue-500"
               >
+                <option value="">---Select Volet---</option>
                 {volets.map(v => (
                   <option key={v.id} value={v.id}>{v.name}</option>
                 ))}

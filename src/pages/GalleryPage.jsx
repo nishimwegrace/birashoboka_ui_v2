@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Image as ImageIcon, ArrowRight, Sparkles, Filter, Eye } from 'lucide-react';
+import { Image as ImageIcon, ArrowRight,  Filter, Eye } from 'lucide-react';
 
 export const GalleryPage = ({ posts, volets, navigate }) => {
   const [selectedVoletId, setSelectedVoletId] = useState(null);
