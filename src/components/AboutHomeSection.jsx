@@ -13,7 +13,7 @@ import ceo from '../assets/ceo.jpg';
 export const AboutHomeSection = ({
   navigate,
   partnersCount,
-  studentsCount = 5000
+  studentsCount = 100
 }) => {
   return (
     <section className="py-16 md:py-24 bg-white border-b border-slate-200/80">

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { 
   Heart, 
   ChevronDown, 
@@ -51,15 +52,18 @@ export const Header = ({
     return false;
   };
 
-  // Lock body scroll when mobile off-canvas is open
+  // Lock body scroll and touch actions when mobile off-canvas is open
   useEffect(() => {
     if (mobileMenuOpen) {
       document.body.style.overflow = 'hidden';
+      document.body.style.touchAction = 'none';
     } else {
-      document.body.style.overflow = 'unset';
+      document.body.style.overflow = '';
+      document.body.style.touchAction = '';
     }
     return () => {
-      document.body.style.overflow = 'unset';
+      document.body.style.overflow = '';
+      document.body.style.touchAction = '';
     };
   }, [mobileMenuOpen]);
 
@@ -331,18 +335,18 @@ export const Header = ({
         </div>
       </div>
 
-      {/* OFF-CANVAS DRAWER THAT POPS FROM RIGHT */}
-      {mobileMenuOpen && (
-        <div className="lg:hidden fixed inset-0 z-50">
+      {/* OFF-CANVAS DRAWER THAT POPS FROM RIGHT TO LEFT (Portaled to document.body to escape header stacking context) */}
+      {mobileMenuOpen && typeof document !== 'undefined' && createPortal(
+        <div className="lg:hidden fixed inset-0 z-[999999]">
           {/* Backdrop Overlay */}
           <div 
             onClick={() => setMobileMenuOpen(false)}
-            className="fixed inset-0 bg-slate-950/70 backdrop-blur-xs transition-opacity duration-300 animate-in fade-in"
+            className="fixed inset-0 bg-slate-950/80 backdrop-blur-md transition-opacity duration-300 animate-in fade-in z-[999998]"
             aria-hidden="true"
           />
 
-          {/* Off-Canvas Panel popping from the Right */}
-          <div className="fixed inset-y-0 right-0 w-full max-w-sm sm:max-w-md bg-white h-full shadow-2xl flex flex-col justify-between z-50 transform transition-transform duration-300 ease-out animate-in slide-in-from-right overflow-hidden">
+          {/* Off-Canvas Panel popping from the Right to Left */}
+          <div className="fixed inset-y-0 right-0 w-[88%] max-w-sm sm:max-w-md bg-white h-full shadow-2xl flex flex-col justify-between z-[999999] transform transition-transform duration-300 ease-out animate-in slide-in-from-right overflow-hidden">
             
             {/* Top Bar of Drawer */}
             <div className="p-5 sm:p-6 border-b border-slate-100 bg-slate-50/80 flex items-center justify-between shrink-0">
@@ -522,31 +526,11 @@ export const Header = ({
                 <Heart className="w-4 h-4 fill-white" />
                 <span>Make a Donation</span>
               </button>
-
-              <div className="grid grid-cols-2 gap-2">
-                <button
-                  onClick={() => handleNavClick('/admin')}
-                  className="flex items-center justify-center gap-1.5 rounded-xl bg-slate-900 py-2.5 text-xs font-bold text-amber-300 border border-slate-800 transition cursor-pointer hover:bg-slate-800"
-                >
-                  <UserCheck className="w-3.5 h-3.5 text-amber-400" />
-                  <span>Admin Portal</span>
-                </button>
-
-                <button
-                  onClick={() => {
-                    setMobileMenuOpen(false);
-                    onOpenApiSettings();
-                  }}
-                  className="flex items-center justify-center gap-1.5 rounded-xl bg-white border border-slate-300 py-2.5 text-xs font-bold text-slate-700 transition cursor-pointer hover:bg-slate-100"
-                >
-                  <SlidersHorizontal className="w-3.5 h-3.5 text-blue-600" />
-                  <span>API Settings</span>
-                </button>
-              </div>
             </div>
 
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </header>
   );

@@ -17,7 +17,7 @@ import { ContactPage } from './pages/ContactPage.jsx';
 import { ApplyPage } from './pages/ApplyPage.jsx';
 import { AdminDashboard } from './pages/AdminDashboard.jsx';
 import { AdminLoginPage } from './pages/AdminLoginPage.jsx';
-import { ApiService } from './services/api.js';
+import { ApiService, getStoredUser, setStoredUser } from './services/api.js';
 import { SEED_VOLETS, SEED_ACTIVITIES, SEED_POSTS, SEED_PARTNERS, SEED_TESTIMONIALS, 
   SEED_CAMPAIGNS, SEED_MEMBERS, SEED_STUDENTS, SEED_INSCRIPTIONS 
 } from './data/seedData.js';
@@ -40,8 +40,8 @@ function AppContent() {
   const [students, setStudents] = useState(SEED_STUDENTS);
   const [inscriptions, setInscriptions] = useState(SEED_INSCRIPTIONS);
   
-  // Auth state (Requires authentication to access admin portal)
-  const [currentUser, setCurrentUser] = useState(null);
+  // Auth state (Restores authenticated session from localStorage on reload)
+  const [currentUser, setCurrentUser] = useState(() => getStoredUser());
 
   const [isApiLive, setIsApiLive] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -261,7 +261,10 @@ function AppContent() {
           <Route path="/admin" element={
             !currentUser ? (
               <AdminLoginPage
-                onLogin={(user) => setCurrentUser(user)}
+                onLogin={(user) => {
+                  setStoredUser(user);
+                  setCurrentUser(user);
+                }}
                 navigate={navigate}
               />
             ) : (
@@ -285,7 +288,10 @@ function AppContent() {
                 onUpdatePartners={setPartners}
                 onUpdateMembers={setMembers}
                 onUpdateTestimonials={setTestimonials}
-                onLogout={() => setCurrentUser(null)}
+                onLogout={() => {
+                  ApiService.logout();
+                  setCurrentUser(null);
+                }}
                 navigate={navigate}
                 onOpenApiSettings={() => setIsSettingsOpen(true)}
               />
@@ -295,6 +301,7 @@ function AppContent() {
           <Route path="/admin/login" element={
             <AdminLoginPage
               onLogin={(user) => {
+                setStoredUser(user);
                 setCurrentUser(user);
                 navigate('/admin');
               }}

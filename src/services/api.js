@@ -12,6 +12,7 @@ import {
 
 const BASE_URL_STORAGE_KEY = 'birashoboka_api_base_url';
 const AUTH_TOKEN_STORAGE_KEY = 'birashoboka_api_token';
+const AUTH_USER_STORAGE_KEY = 'birashoboka_api_user';
 
 export function getStoredApiBaseUrl() {
   if (typeof window === 'undefined') return 'http://localhost:8000';
@@ -35,6 +36,33 @@ export function getStoredAuthToken() {
 export function setStoredAuthToken(token) {
   if (typeof window !== 'undefined') {
     localStorage.setItem(AUTH_TOKEN_STORAGE_KEY, token.trim());
+  }
+}
+
+export function getStoredUser() {
+  if (typeof window === 'undefined') return null;
+  try {
+    const raw = localStorage.getItem(AUTH_USER_STORAGE_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+}
+
+export function setStoredUser(user) {
+  if (typeof window !== 'undefined') {
+    if (user) {
+      localStorage.setItem(AUTH_USER_STORAGE_KEY, JSON.stringify(user));
+    } else {
+      localStorage.removeItem(AUTH_USER_STORAGE_KEY);
+    }
+  }
+}
+
+export function clearStoredAuth() {
+  if (typeof window !== 'undefined') {
+    localStorage.removeItem(AUTH_TOKEN_STORAGE_KEY);
+    localStorage.removeItem(AUTH_USER_STORAGE_KEY);
   }
 }
 
@@ -338,6 +366,9 @@ export const ApiService = {
         if (json.data.token) {
           setStoredAuthToken(json.data.token);
         }
+        if (json.data.user) {
+          setStoredUser(json.data.user);
+        }
         return { success: true, user: json.data.user, token: json.data.token, message: json.message };
       }
       return { success: false, message: json.message || 'Invalid login credentials.' };
@@ -364,7 +395,7 @@ export const ApiService = {
         // ignore
       }
     }
-    setStoredAuthToken('');
+    clearStoredAuth();
     return { success: true };
   },
 
