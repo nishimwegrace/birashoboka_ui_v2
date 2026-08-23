@@ -553,29 +553,27 @@ export const ApplyPage = ({
 
                 <div>
                   <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                    Age (Years) *
-                  </label>
-                  <input
-                    type="number"
-                    min="14"
-                    max="65"
-                    value={age}
-                    onChange={(e) => setAge(Number(e.target.value))}
-                    required
-                    className="w-full px-4 py-3 rounded-xl border border-slate-300 text-slate-900 text-sm font-medium focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                    Date of Birth
+                    Date of Birth (Date de Naissance) *
                   </label>
                   <input
                     type="date"
                     value={birthDate}
-                    onChange={(e) => setBirthDate(e.target.value)}
+                    onChange={(e) => {
+                      const dob = e.target.value;
+                      setBirthDate(dob);
+                      if (dob) {
+                        const calculated = Math.max(0, new Date().getFullYear() - new Date(dob).getFullYear());
+                        setAge(calculated);
+                      }
+                    }}
+                    required
                     className="w-full px-4 py-3 rounded-xl border border-slate-300 text-slate-900 text-sm font-medium focus:ring-2 focus:ring-blue-500"
                   />
+                  {birthDate && (
+                    <span className="text-xs text-slate-500 font-medium mt-1 block">
+                      Calculated Age: <strong className="text-slate-800">{Math.max(0, new Date().getFullYear() - new Date(birthDate).getFullYear())} years old</strong>
+                    </span>
+                  )}
                 </div>
 
                 <div>

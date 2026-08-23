@@ -1424,11 +1424,15 @@ export const AdminDashboard = ({
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Age</label>
+                <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Date of Birth *</label>
                 <input
-                  type="number"
-                  value={editingStudent.age || 20}
-                  onChange={(e) => setEditingStudent({ ...editingStudent, age: Number(e.target.value) })}
+                  type="date"
+                  value={editingStudent.birth_date || ''}
+                  onChange={(e) => {
+                    const dob = e.target.value;
+                    const calculated = dob ? Math.max(0, new Date().getFullYear() - new Date(dob).getFullYear()) : (editingStudent.age || 20);
+                    setEditingStudent({ ...editingStudent, birth_date: dob, age: calculated });
+                  }}
                   className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-300 text-slate-900 text-sm focus:bg-white focus:ring-2 focus:ring-blue-500"
                 />
               </div>
