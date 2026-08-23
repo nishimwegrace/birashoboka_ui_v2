@@ -69,6 +69,8 @@ export const AdminDashboard = ({
   // Post modal
   const [postModalOpen, setPostModalOpen] = useState(false);
   const [editingPost, setEditingPost] = useState(null);
+  const [featuredImageFile, setFeaturedImageFile] = useState(null);
+  const [galleryImageFiles, setGalleryImageFiles] = useState([]);
 
   // Campaign modal
   const [campaignModalOpen, setCampaignModalOpen] = useState(false);
@@ -85,10 +87,12 @@ export const AdminDashboard = ({
   // Partner modal
   const [partnerModalOpen, setPartnerModalOpen] = useState(false);
   const [editingPartner, setEditingPartner] = useState(null);
+  const [partnerLogoFile, setPartnerLogoFile] = useState(null);
 
   // Member modal
   const [memberModalOpen, setMemberModalOpen] = useState(false);
   const [editingMember, setEditingMember] = useState(null);
+  const [memberAvatarFile, setMemberAvatarFile] = useState(null);
 
   // Success toast message
   const [notification, setNotification] = useState(null);
