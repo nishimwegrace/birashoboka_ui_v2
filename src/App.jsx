@@ -45,14 +45,8 @@ export function App() {
   const [students, setStudents] = useState(SEED_STUDENTS);
   const [inscriptions, setInscriptions] = useState(SEED_INSCRIPTIONS);
   
-  // Auth state (Defaulted with open test admin as requested, but can log out)
-  const [currentUser, setCurrentUser] = useState({
-    id: 1,
-    name: 'Gérard Nishimwe',
-    email: 'admin@birashobokacenter.org',
-    role: 'admin',
-    avatar: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=400&q=80'
-  });
+  // Auth state (Requires authentication to access admin portal)
+  const [currentUser, setCurrentUser] = useState(null);
 
   const [isApiLive, setIsApiLive] = useState(false);
   const [isLoading, setIsLoading] = useState(true);

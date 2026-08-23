@@ -3,8 +3,8 @@ import { Lock, Mail, ShieldCheck, ArrowRight,  Building2, UserCheck, AlertCircle
 import { ApiService } from '../services/api.js';
 
 export const AdminLoginPage = ({ onLogin, navigate }) => {
-  const [email, setEmail] = useState('admin@birashobokacenter.org');
-  const [password, setPassword] = useState('admin123');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(true);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -30,46 +30,16 @@ export const AdminLoginPage = ({ onLogin, navigate }) => {
           name: res.user.name || 'Administrator',
           email: res.user.email,
           role: 'admin',
-          avatar: res.user.avatar || 'https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=400&q=80'
+          avatar: res.user.avatar || null,
         });
         navigate('/admin');
       } else {
-        // Fallback for test demo mode if backend user not found or offline
-        const authUser = {
-          id: 1,
-          name: 'Administrator',
-          email: email.trim(),
-          role: 'admin',
-          avatar: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=400&q=80'
-        };
-        onLogin(authUser);
-        navigate('/admin');
+        setError(res.message || 'Invalid credentials. Please check your email and password and try again.');
       }
-    } catch {
+    } catch (err) {
       setIsLoading(false);
-      const authUser = {
-        id: 1,
-        name: 'Administrator',
-        email: email.trim(),
-        role: 'admin',
-        avatar: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=400&q=80'
-      };
-      onLogin(authUser);
-      navigate('/admin');
+      setError(err?.message || 'Connection error. Please try again.');
     }
-  };
-
-
-  const handleInstantDemoLogin = () => {
-    const authUser = {
-      id: 1,
-      name: 'Admissions & Center Coordinator',
-      email: 'admin@birashobokacenter.org',
-      role: 'admin',
-      avatar: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=400&q=80'
-    };
-    onLogin(authUser);
-    navigate('/admin');
   };
 
   return (
@@ -78,39 +48,12 @@ export const AdminLoginPage = ({ onLogin, navigate }) => {
         
         {/* Header Branding */}
         <div className="text-center space-y-3">
-          <div className="flex items-center justify-center gap-3">
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-700 text-white flex items-center justify-center font-black text-2xl shadow-lg shadow-blue-600/30">
-              B
-            </div>
-            <div className="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-xs border border-emerald-300">
-              HVPM
-            </div>
-          </div>
-
           <h2 className="text-2xl font-extrabold text-slate-900 tracking-tight">
             Birashoboka Center Portal
           </h2>
           <p className="text-xs text-slate-500 font-medium">
             Administrative Management Hub · CRBN & The Chris Lyricure
           </p>
-        </div>
-
-        {/* Instant Access Banner for Testing */}
-        <div className="p-4 rounded-2xl bg-blue-50 border border-blue-200 text-blue-900 text-xs space-y-2">
-          <div className="flex items-center gap-2 font-bold text-blue-900">
-            <span>Test Mode / Open Access Active</span>
-          </div>
-          <p className="text-slate-600 leading-relaxed">
-            As requested, admin access is open for testing. You can use the quick login button below to immediately access the management dashboard.
-          </p>
-          <button
-            type="button"
-            onClick={handleInstantDemoLogin}
-            className="w-full mt-2 py-2.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs flex items-center justify-center gap-2 transition shadow-md shadow-blue-600/30 cursor-pointer"
-          >
-            <UserCheck className="w-4 h-4" />
-            <span>Instant One-Click Login (Test Mode)</span>
-          </button>
         </div>
 
         {/* Login Form */}
