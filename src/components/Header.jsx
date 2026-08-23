@@ -11,15 +11,17 @@ import {
   Building2,
   ShieldCheck,
   UserCheck,
+  PhoneCall,
   Compass,
   Home,
   Info,
   Layers,
   FileText,
   Image as ImageIcon,
-  PhoneCall,
   ChevronRight
 } from 'lucide-react';
+import birashobokaLogo from '../assets/birashoboka_logo.png';
+import hvpLogo from '../assets/hvp_logo.png';
 
 export const Header = ({
   currentPath,
@@ -118,54 +120,25 @@ export const Header = ({
       <div className="w-full px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto flex h-22 items-center justify-between gap-4">
           
-          {/* Part 1: Prominent Hierarchical Logos (HVP Makebuko & Birashoboka Center) - Increased size, text removed */}
+          {/* Part 1: Logos (HVP Makebuko & Birashoboka Center) */}
           <div className="flex items-center">
             <button
               onClick={() => handleNavClick('/')}
-              className="flex items-center gap-3 sm:gap-4 p-1 rounded-2xl hover:bg-slate-100/60 transition group focus:outline-hidden cursor-pointer"
+              className="flex items-center gap-3 sm:gap-4 transition hover:opacity-90 focus:outline-none cursor-pointer"
               aria-label="Birashoboka Center & HVP Makebuko Home"
               title="Birashoboka Center (Initié par HVP Makebuko)"
             >
-              {/* Parent Institution Logo: HVP Makebuko (Maison Mère) */}
-              <div 
-                className="relative flex h-14 w-14 sm:h-16 sm:w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-600 via-teal-700 to-emerald-900 text-white shadow-md shadow-emerald-700/25 border-2 border-emerald-400/40 group-hover:scale-105 transition-all duration-200 shrink-0"
-                title="HVP Makebuko — Institution Mère"
-              >
-                {/* SVG Emblem for HVP Makebuko */}
-                <svg className="w-10 h-10 sm:w-11 sm:h-11 drop-shadow-sm" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <circle cx="50" cy="50" r="44" stroke="#A7F3D0" strokeWidth="3" strokeDasharray="4 2" />
-                  <path d="M50 15 L78 30 L78 65 L50 85 L22 65 L22 30 Z" fill="#047857" stroke="#34D399" strokeWidth="2.5" />
-                  {/* Medical Cross / Rehab Star */}
-                  <path d="M46 32 H54 V46 H68 V54 H54 V68 H46 V54 H32 V46 H46 Z" fill="#FFFFFF" />
-                  <circle cx="50" cy="50" r="5" fill="#10B981" />
-                  <text x="50" y="27" textAnchor="middle" fill="#FDE68A" fontSize="9" fontWeight="900" letterSpacing="1">HVP</text>
-                  <text x="50" y="80" textAnchor="middle" fill="#ECFDF5" fontSize="7.5" fontWeight="800" letterSpacing="0.5">MAKEBUKO</text>
-                </svg>
-                <span className="absolute -bottom-1.5 -right-1 px-1.5 py-0.2 rounded-full bg-emerald-950 text-emerald-300 text-[8px] font-black tracking-wider uppercase border border-emerald-600/60 shadow-xs">
-                  Mère
-                </span>
-              </div>
-
-              {/* Visual Divider */}
-              <div className="h-10 sm:h-12 w-px bg-slate-200/90" />
-
-              {/* Birashoboka Center Main Logo */}
-              <div 
-                className="relative flex h-14 w-14 sm:h-16 sm:w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-600 via-indigo-600 to-blue-800 text-white shadow-md shadow-blue-600/30 border-2 border-blue-400/40 group-hover:scale-105 transition-all duration-200 shrink-0"
-                title="Birashoboka Center (CRBN & The Chris Lyricure)"
-              >
-                {/* SVG Emblem for Birashoboka */}
-                <svg className="w-10 h-10 sm:w-11 sm:h-11 drop-shadow-sm" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <circle cx="50" cy="50" r="44" stroke="#93C5FD" strokeWidth="2.5" />
-                  <circle cx="50" cy="50" r="38" fill="#1E40AF" />
-                  {/* Dynamic B logo mark with sunburst / rays of hope */}
-                  <path d="M34 26 H52 C61 26 66 31 66 38 C66 43 62 47 56 49 C63 51 68 56 68 63 C68 71 61 76 51 76 H34 V26 Z M44 35 V46 H51 C55 46 58 43 58 40.5 C58 38 55 35 51 35 H44 Z M44 55 V67 H52 C57 67 60 64 60 61 C60 58 57 55 52 55 H44 Z" fill="#FFFFFF" />
-                  <path d="M72 26 L76 34 L84 38 L76 42 L72 50 L68 42 L60 38 L68 34 Z" fill="#FBBF24" />
-                </svg>
-                <span className="absolute -bottom-1.5 -right-1 px-1.5 py-0.2 rounded-full bg-blue-950 text-blue-300 text-[8px] font-black tracking-wider uppercase border border-blue-500/60 shadow-xs">
-                  CRBN
-                </span>
-              </div>
+              <img 
+                src={hvpLogo} 
+                alt="HVP Makebuko" 
+                className="h-18 sm:h-18 w-auto object-contain shrink-0" 
+              />
+              <div className="h-8 sm:h-10 w-px bg-slate-200" />
+              <img 
+                src={birashobokaLogo} 
+                alt="Birashoboka Center" 
+                className="h-18 sm:h-18 w-auto object-contain shrink-0" 
+              />
             </button>
           </div>
 
@@ -413,28 +386,18 @@ export const Header = ({
             
             {/* Top Bar of Drawer */}
             <div className="p-5 sm:p-6 border-b border-slate-100 bg-slate-50/80 flex items-center justify-between shrink-0">
-              <div className="flex items-center gap-2.5">
-                {/* HVP Makebuko Logo */}
-                <div className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-600 to-teal-800 text-white shadow-xs border border-emerald-400/40">
-                  <svg className="w-7 h-7" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M50 15 L78 30 L78 65 L50 85 L22 65 L22 30 Z" fill="#047857" stroke="#34D399" strokeWidth="2.5" />
-                    <path d="M46 32 H54 V46 H68 V54 H54 V68 H46 V54 H32 V46 H46 Z" fill="#FFFFFF" />
-                    <text x="50" y="27" textAnchor="middle" fill="#FDE68A" fontSize="9" fontWeight="900">HVP</text>
-                  </svg>
-                </div>
+              <div className="flex items-center gap-3">
+                <img 
+                  src={hvpLogo} 
+                  alt="HVP Makebuko" 
+                  className="h-9 w-auto object-contain shrink-0" 
+                />
                 <div className="h-6 w-px bg-slate-200" />
-                {/* Birashoboka Logo */}
-                <div className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-blue-600 to-indigo-800 text-white shadow-xs border border-blue-400/40">
-                  <svg className="w-7 h-7" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="50" cy="50" r="38" fill="#1E40AF" />
-                    <path d="M34 26 H52 C61 26 66 31 66 38 C66 43 62 47 56 49 C63 51 68 56 68 63 C68 71 61 76 51 76 H34 V26 Z M44 35 V46 H51 C55 46 58 43 58 40.5 C58 38 55 35 51 35 H44 Z M44 55 V67 H52 C57 67 60 64 60 61 C60 58 57 55 52 55 H44 Z" fill="#FFFFFF" />
-                    <path d="M72 26 L76 34 L84 38 L76 42 L72 50 L68 42 L60 38 L68 34 Z" fill="#FBBF24" />
-                  </svg>
-                </div>
-                <div className="ml-1">
-                  <span className="font-extrabold text-slate-900 text-sm block leading-tight">Birashoboka Center</span>
-                  <span className="text-[11px] text-slate-500 font-semibold">Burundi Vocational & Care</span>
-                </div>
+                <img 
+                  src={birashobokaLogo} 
+                  alt="Birashoboka Center" 
+                  className="h-9 w-auto object-contain shrink-0" 
+                />
               </div>
 
               {/* Close Button */}
