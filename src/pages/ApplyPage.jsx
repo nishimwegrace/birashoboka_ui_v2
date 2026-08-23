@@ -37,7 +37,6 @@ export const ApplyPage = ({
   // Find open campaigns
   const openCampaigns = campaigns.filter(c => c.is_open !== false);
   const defaultCampaign = openCampaigns[0] || campaigns[0];
-
   // Resolve initial Volet & Activity
   const matchedVolet = volets.find(v => 
     initialVoletName && v.name.toLowerCase() === decodeURIComponent(initialVoletName).toLowerCase()
@@ -94,6 +93,8 @@ export const ApplyPage = ({
   const availableActivities = activities.filter(a => a.volet_id === Number(selectedVoletId));
 
   useEffect(() => {
+console.log(openCampaigns, 'openCampaigns');
+
     if (availableActivities.length > 0 && (!selectedActivityId || !availableActivities.some(a => a.id === selectedActivityId))) {
       setSelectedActivityId(availableActivities[0].id);
     }
@@ -181,11 +182,6 @@ export const ApplyPage = ({
 
         {/* Header Breadcrumb & Title */}
         <div className="text-center max-w-3xl mx-auto space-y-3">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-100 text-amber-900 text-xs font-bold uppercase tracking-wider border border-amber-300">
-            <GraduationCap className="w-4 h-4 text-amber-700" />
-            <span>Admissions & Inscriptions Portal · Birashoboka Center</span>
-          </div>
-
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-slate-900 tracking-tight leading-tight">
             Apply for Vocational Training & Empowerment
           </h1>
@@ -398,7 +394,7 @@ export const ApplyPage = ({
                   </div>
                 </div>
 
-                {campaigns.length > 1 && (
+                {openCampaigns.length > 1 && (
                   <div className="flex items-center gap-2">
                     <label className="text-xs text-slate-300 font-semibold shrink-0">Switch Campaign:</label>
                     <select

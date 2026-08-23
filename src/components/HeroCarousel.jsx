@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ChevronLeft, ChevronRight, ArrowRight, Heart, Sparkles, BookOpen } from 'lucide-react';
+import { ChevronLeft, ChevronRight, ArrowRight, Heart, BookOpen } from 'lucide-react';
 
 export const HeroCarousel = ({ posts, navigate }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -59,12 +59,6 @@ export const HeroCarousel = ({ posts, navigate }) => {
       {/* Content Overlay */}
       <div className="relative z-10 max-w-7xl mx-auto h-full px-4 sm:px-6 lg:px-8 flex flex-col justify-center">
         <div className="max-w-2xl text-white space-y-5">
-          {/* Eyebrow badge */}
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-600/90 backdrop-blur-md text-white text-xs font-semibold tracking-wide shadow-md">
-            <Sparkles className="w-3.5 h-3.5 text-blue-200" />
-            <span>CRBN & The Chris Lyricure Center · Bujumbura & Ngozi</span>
-          </div>
-
           {/* Main Headline */}
           <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-white tracking-tight leading-[1.15] drop-shadow-sm">
             Empowering Vulnerable Youth & Women Through Skills
@@ -108,9 +102,6 @@ export const HeroCarousel = ({ posts, navigate }) => {
             className="mt-6 pt-4 border-t border-white/15 flex items-center justify-between text-xs text-slate-300 hover:text-white cursor-pointer group/card max-w-lg transition"
           >
             <div className="flex items-center gap-3">
-              <span className="px-2 py-0.5 rounded bg-white/20 text-[10px] font-bold uppercase tracking-wider text-blue-200">
-                Featured Story {currentIndex + 1}/{displayPosts.length}
-              </span>
               <span className="font-medium line-clamp-1 group-hover/card:underline text-slate-100">
                 {currentPost.title}
               </span>

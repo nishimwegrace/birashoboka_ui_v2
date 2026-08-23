@@ -23,10 +23,6 @@ export const PartnersCarousel = ({ partners, navigate }) => {
         {/* Header with manual controllers */}
         <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-8 gap-4">
           <div>
-            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-bold uppercase tracking-wider border border-blue-200">
-              <Handshake className="w-3.5 h-3.5" />
-              Strategic Alliances
-            </span>
             <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight mt-2">
               Our Trusted Partners & Supporters
             </h2>

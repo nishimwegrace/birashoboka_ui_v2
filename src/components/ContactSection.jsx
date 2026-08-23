@@ -10,7 +10,6 @@ import {
   Heart,
   Building,
   CreditCard,
-  Sparkles
 } from 'lucide-react';
 import { ApiService } from '../services/api.js';
 
@@ -54,14 +53,9 @@ export const ContactSection = ({
 
   return (
     <section className={`bg-white ${isFullPage ? 'py-12' : 'py-16 md:py-24'}`}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">        
         {/* Section Title */}
         <div className="text-center max-w-2xl mx-auto mb-14">
-          <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-bold uppercase tracking-wider border border-blue-200">
-            <Mail className="w-3.5 h-3.5" />
-            Get In Touch
-          </span>
           <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight mt-3">
             Contact Birashoboka Center
           </h2>

@@ -6,9 +6,7 @@ import {
   ShieldCheck, 
   Sparkles,
   Users, 
-  Award, 
   CheckCircle2, 
-  Building2, 
   Globe2, 
   Mail,
   ArrowRight,
@@ -56,10 +54,6 @@ export const AboutPage = ({ members, partners, navigate }) => {
       <div className="bg-slate-900 text-white py-16 sm:py-20 border-b border-slate-800 relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="max-w-3xl">
-            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-600/30 text-blue-300 text-xs font-bold uppercase tracking-wider border border-blue-500/30 mb-4">
-              <Award className="w-3.5 h-3.5" />
-              Our Identity & Purpose
-            </span>
             <h1 className="text-3xl sm:text-5xl font-extrabold text-white tracking-tight leading-tight">
               About Birashoboka Center
             </h1>
@@ -76,9 +70,6 @@ export const AboutPage = ({ members, partners, navigate }) => {
         {/* 1. Detailed About Description & Background */}
         <section data-aos="fade-up" data-aos-duration="600" className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
           <div className="lg:col-span-6 space-y-5">
-            <span className="text-xs font-bold uppercase tracking-wider text-blue-600">
-              Grassroots Foundation
-            </span>
             <h2 className="text-3xl font-extrabold text-slate-900 tracking-tight">
               A Safe Haven for Renewal and Economic Autonomy
             </h2>
@@ -151,10 +142,6 @@ export const AboutPage = ({ members, partners, navigate }) => {
         {/* 3. HVPM and its details (Static from online version) */}
         <section data-aos="fade-up" data-aos-duration="600" className="bg-gradient-to-br from-slate-900 to-slate-950 text-white rounded-3xl p-8 sm:p-12 shadow-2xl border border-slate-800">
           <div className="max-w-3xl space-y-4">
-            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/20 text-blue-300 text-xs font-bold uppercase tracking-wider border border-blue-500/30">
-              <Building2 className="w-3.5 h-3.5" />
-              Institutional Heritage & Foundation
-            </span>
             <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
               HVP Makebuko (HVPM) Collaboration
             </h2>

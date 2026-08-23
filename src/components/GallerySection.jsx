@@ -1,5 +1,5 @@
 import React from 'react';
-import { Image as ImageIcon, ArrowRight, ExternalLink, Sparkles } from 'lucide-react';
+import { ArrowRight, ExternalLink } from 'lucide-react';
 
 export const GallerySection = ({ 
   posts, 
@@ -35,10 +35,6 @@ export const GallerySection = ({
         {!isFullPage && (
           <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-12 gap-4">
             <div>
-              <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-bold uppercase tracking-wider border border-blue-200">
-                <ImageIcon className="w-3.5 h-3.5" />
-                Visual Chronicles
-              </span>
               <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight mt-3">
                 Photo Gallery of Life at Birashoboka
               </h2>

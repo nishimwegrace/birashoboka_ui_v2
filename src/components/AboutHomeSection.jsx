@@ -57,9 +57,6 @@ export const AboutHomeSection = ({
           {/* Right Column: About Description & CTA */}
           <div className="lg:col-span-7 space-y-6">
             <div>
-              <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-bold uppercase tracking-wider border border-blue-200">
-                About Birashoboka Center
-              </span>
               <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight mt-3">
                 Restoring Dignity, Hope, and Financial Independence
               </h2>

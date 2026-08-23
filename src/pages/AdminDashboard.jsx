@@ -362,12 +362,19 @@ export const AdminDashboard = ({
     const res = await ApiService.savePartner(editingPartner, files);
     const saved = res.partner || editingPartner;
 
+    const matchedVolet = volets.find(v => String(v.id) === String(saved.volet_id || editingPartner.volet_id));
+    const enrichedPartner = {
+      ...saved,
+      volet_id: saved.volet_id !== undefined ? saved.volet_id : (editingPartner.volet_id || null),
+      volet: matchedVolet || saved.volet || null
+    };
+
     if (editingPartner.id) {
-      const updated = partners.map(p => p.id === editingPartner.id ? { ...p, ...saved } : p);
+      const updated = partners.map(p => p.id === editingPartner.id ? { ...p, ...enrichedPartner } : p);
       onUpdatePartners(updated);
       showNotification('Partner updated!');
     } else {
-      onUpdatePartners([...partners, saved]);
+      onUpdatePartners([...partners, enrichedPartner]);
       showNotification('New Partner added!');
     }
     setPartnerModalOpen(false);
@@ -1990,6 +1997,25 @@ export const AdminDashboard = ({
                 className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-300 text-slate-900 text-sm focus:bg-white focus:ring-2 focus:ring-blue-500"
                 placeholder="e.g. UN Agency & Health Partner"
               />
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Associated Program / Volet</label>
+              <select
+                value={editingPartner.volet_id || ''}
+                onChange={(e) => setEditingPartner({ 
+                  ...editingPartner, 
+                  volet_id: e.target.value ? Number(e.target.value) : null 
+                })}
+                className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-300 text-slate-900 text-sm font-medium focus:bg-white focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="">General Institutional Partner (All Centers)</option>
+                {volets.map(v => (
+                  <option key={v.id} value={v.id}>
+                    {v.name} — {v.subtitle || v.slogan}
+                  </option>
+                ))}
+              </select>
             </div>
 
             <div>

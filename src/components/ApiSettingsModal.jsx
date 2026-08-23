@@ -6,7 +6,6 @@ import {
   Key, 
   RefreshCw, 
   Database, 
-  Sparkles, 
   AlertCircle, 
   CheckCircle2, 
   Code2, 

@@ -11,9 +11,6 @@ export const ContactPage = ({ navigate, currentSearch = '' }) => {
       <div className="bg-slate-900 text-white py-16 sm:py-20 border-b border-slate-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl">
-            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-600/30 text-blue-300 text-xs font-bold uppercase tracking-wider border border-blue-500/30 mb-4">
-              {isDonation ? 'Support Birashoboka Center' : 'Contact & Admissions'}
-            </span>
             <h1 className="text-3xl sm:text-5xl font-extrabold text-white tracking-tight">
               {isDonation ? 'Donate & Support Our Programs' : 'Get in Touch with Us'}
             </h1>
