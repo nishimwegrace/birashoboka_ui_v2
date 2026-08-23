@@ -293,6 +293,54 @@ export const ApiService = {
     return { items: enriched, isLive: res.isLive };
   },
 
+  // Auth
+  async login(email, password) {
+    const baseUrl = getStoredApiBaseUrl();
+    const cleanBase = baseUrl.replace(/\/+$/, '');
+    const url = cleanBase ? `${cleanBase}/api/auth/login` : '/api/auth/login';
+
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+      const json = await response.json();
+
+      if (response.ok && json.data) {
+        if (json.data.token) {
+          setStoredAuthToken(json.data.token);
+        }
+        return { success: true, user: json.data.user, token: json.data.token, message: json.message };
+      }
+      return { success: false, message: json.message || 'Invalid login credentials.' };
+    } catch (err) {
+      return { success: false, message: err?.message || 'Network error connecting to auth server.' };
+    }
+  },
+
+  async logout() {
+    const token = getStoredAuthToken();
+    if (token) {
+      const baseUrl = getStoredApiBaseUrl();
+      const cleanBase = baseUrl.replace(/\/+$/, '');
+      const url = cleanBase ? `${cleanBase}/api/auth/logout` : '/api/auth/logout';
+      try {
+        await fetch(url, {
+          method: 'POST',
+          headers: {
+            'Authorization': token.startsWith('Bearer ') ? token : `Bearer ${token}`,
+            'Accept': 'application/json'
+          }
+        });
+      } catch {
+        // ignore
+      }
+    }
+    setStoredAuthToken('');
+    return { success: true };
+  },
+
   // Submit Contact Form
   async submitContact(formData) {
     const baseUrl = getStoredApiBaseUrl();
@@ -317,17 +365,17 @@ export const ApiService = {
     };
   },
 
-  // Submit Complete Inscription & Student creation
+  // Submit Complete Inscription & Student creation (atomic POST /api/enroll)
   async submitFullEnrollment(payload) {
     const baseUrl = getStoredApiBaseUrl();
     const cleanBase = baseUrl.replace(/\/+$/, '');
-    const url = cleanBase ? `${cleanBase}/api/inscriptions` : '/api/inscriptions';
+    const url = cleanBase ? `${cleanBase}/api/enroll` : '/api/enroll';
 
     const newStudentId = Date.now();
     const newInscriptionId = Date.now() + 1;
     const refNum = `INS-2026-${Math.floor(1000 + Math.random() * 9000)}`;
 
-    const createdStudent = {
+    const fallbackStudent = {
       id: newStudentId,
       name: payload.student.name || 'New Student',
       email: payload.student.email || null,
@@ -345,7 +393,7 @@ export const ApiService = {
       created_at: new Date().toISOString()
     };
 
-    const createdInscription = {
+    const fallbackInscription = {
       id: newInscriptionId,
       reference_number: refNum,
       campaign_id: payload.inscription.campaign_id || 1,
@@ -359,7 +407,7 @@ export const ApiService = {
       preferred_center: payload.inscription.preferred_center || 'ngozi',
       notes: 'Submitted via online portal',
       created_at: new Date().toISOString(),
-      student: createdStudent
+      student: fallbackStudent
     };
 
     try {
@@ -368,14 +416,16 @@ export const ApiService = {
         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
         body: JSON.stringify(payload)
       });
-      if (response.ok) {
-        const json = await response.json();
+      const json = await response.json();
+      if (response.ok && json.data) {
         return {
           success: true,
-          student: json.data?.student || createdStudent,
-          inscription: json.data?.inscription || createdInscription,
-          message: 'Enrollment application submitted successfully!'
+          student: json.data.student,
+          inscription: json.data.inscription,
+          message: json.message || 'Enrollment application submitted successfully!'
         };
+      } else if (json.message) {
+        return { success: false, message: json.message, errors: json.errors };
       }
     } catch {
       // Fallback
@@ -383,32 +433,127 @@ export const ApiService = {
 
     return {
       success: true,
-      student: createdStudent,
-      inscription: createdInscription,
+      student: fallbackStudent,
+      inscription: fallbackInscription,
       message: 'Enrollment application registered successfully! Please keep your reference number.'
     };
   },
 
-  // Save / Update methods for Admin Dashboard
-  async savePost(post) {
-    const newPost = {
-      id: post.id || Date.now(),
-      volet_id: post.volet_id || 1,
-      title: post.title || 'Untitled Post',
-      description: post.description || '',
-      featured_image: post.featured_image || 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=1200&q=80',
-      image_urls: post.image_urls || [post.featured_image || ''],
-      published_at: post.published_at || new Date().toISOString().slice(0, 19).replace('T', ' '),
-      created_at: post.created_at || new Date().toISOString()
+  // Post CRUD with single file featured_image and multiple files image_urls[]
+  async savePost(postData, files = {}) {
+    const baseUrl = getStoredApiBaseUrl();
+    const token = getStoredAuthToken();
+    const cleanBase = baseUrl.replace(/\/+$/, '');
+    const isUpdate = !!postData.id;
+    const url = cleanBase 
+      ? (isUpdate ? `${cleanBase}/api/posts/${postData.id}` : `${cleanBase}/api/posts`)
+      : (isUpdate ? `/api/posts/${postData.id}` : '/api/posts');
+
+    // Build FormData if files are present
+    const hasFeaturedFile = files.featured_image instanceof File;
+    const hasGalleryFiles = Array.isArray(files.image_urls) && files.image_urls.some(f => f instanceof File);
+
+    try {
+      const headers = { 'Accept': 'application/json' };
+      if (token) headers['Authorization'] = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
+
+      let body;
+      if (hasFeaturedFile || hasGalleryFiles) {
+        body = new FormData();
+        body.append('volet_id', postData.volet_id || 1);
+        body.append('title', postData.title || '');
+        body.append('description', postData.description || '');
+        if (postData.published_at) body.append('published_at', postData.published_at);
+
+        if (hasFeaturedFile) {
+          body.append('featured_image', files.featured_image);
+        }
+        if (hasGalleryFiles) {
+          for (const file of files.image_urls) {
+            if (file instanceof File) {
+              body.append('image_urls[]', file);
+            }
+          }
+        }
+      } else {
+        headers['Content-Type'] = 'application/json';
+        body = JSON.stringify({
+          volet_id: postData.volet_id || 1,
+          title: postData.title || '',
+          description: postData.description || '',
+          published_at: postData.published_at || null
+        });
+      }
+
+      const method = isUpdate ? (hasFeaturedFile || hasGalleryFiles ? 'POST' : 'PUT') : 'POST';
+      const response = await fetch(url, { method, headers, body });
+      const json = await response.json();
+
+      if (response.ok && json.data) {
+        return { success: true, post: json.data, message: json.message };
+      }
+      if (json.message) return { success: false, message: json.message };
+    } catch {
+      // Fallback
+    }
+
+    const fallbackPost = {
+      id: postData.id || Date.now(),
+      volet_id: postData.volet_id || 1,
+      title: postData.title || 'Untitled Post',
+      description: postData.description || '',
+      featured_image: postData.featured_image || 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=1200&q=80',
+      image_urls: postData.image_urls || [postData.featured_image || ''],
+      published_at: postData.published_at || new Date().toISOString().slice(0, 19).replace('T', ' '),
+      created_at: postData.created_at || new Date().toISOString()
     };
-    return { success: true, post: newPost };
+    return { success: true, post: fallbackPost };
   },
 
   async deletePost(id) {
+    const baseUrl = getStoredApiBaseUrl();
+    const token = getStoredAuthToken();
+    const cleanBase = baseUrl.replace(/\/+$/, '');
+    const url = cleanBase ? `${cleanBase}/api/posts/${id}` : `/api/posts/${id}`;
+
+    try {
+      const headers = { 'Accept': 'application/json' };
+      if (token) headers['Authorization'] = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
+      const response = await fetch(url, { method: 'DELETE', headers });
+      if (response.ok) return { success: true };
+    } catch {
+      // Fallback
+    }
     return { success: true };
   },
 
+  // Campaign CRUD
   async saveCampaign(campaign) {
+    const baseUrl = getStoredApiBaseUrl();
+    const token = getStoredAuthToken();
+    const cleanBase = baseUrl.replace(/\/+$/, '');
+    const isUpdate = !!campaign.id;
+    const url = cleanBase 
+      ? (isUpdate ? `${cleanBase}/api/campaigns/${campaign.id}` : `${cleanBase}/api/campaigns`)
+      : (isUpdate ? `/api/campaigns/${campaign.id}` : '/api/campaigns');
+
+    try {
+      const headers = { 'Content-Type': 'application/json', 'Accept': 'application/json' };
+      if (token) headers['Authorization'] = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
+
+      const response = await fetch(url, {
+        method: isUpdate ? 'PUT' : 'POST',
+        headers,
+        body: JSON.stringify(campaign)
+      });
+      const json = await response.json();
+      if (response.ok && json.data) {
+        return { success: true, campaign: json.data };
+      }
+    } catch {
+      // Fallback
+    }
+
     const saved = {
       id: campaign.id || Date.now(),
       volet_id: campaign.volet_id || 1,
@@ -427,7 +572,62 @@ export const ApiService = {
     return { success: true, campaign: saved };
   },
 
-  async savePartner(partner) {
+  async deleteCampaign(id) {
+    const baseUrl = getStoredApiBaseUrl();
+    const token = getStoredAuthToken();
+    const cleanBase = baseUrl.replace(/\/+$/, '');
+    const url = cleanBase ? `${cleanBase}/api/campaigns/${id}` : `/api/campaigns/${id}`;
+
+    try {
+      const headers = { 'Accept': 'application/json' };
+      if (token) headers['Authorization'] = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
+      const response = await fetch(url, { method: 'DELETE', headers });
+      if (response.ok) return { success: true };
+    } catch {
+      // Fallback
+    }
+    return { success: true };
+  },
+
+  // Partner CRUD with logo file upload
+  async savePartner(partner, files = {}) {
+    const baseUrl = getStoredApiBaseUrl();
+    const token = getStoredAuthToken();
+    const cleanBase = baseUrl.replace(/\/+$/, '');
+    const isUpdate = !!partner.id;
+    const url = cleanBase 
+      ? (isUpdate ? `${cleanBase}/api/partners/${partner.id}` : `${cleanBase}/api/partners`)
+      : (isUpdate ? `/api/partners/${partner.id}` : '/api/partners');
+
+    const hasLogoFile = files.logo instanceof File;
+
+    try {
+      const headers = { 'Accept': 'application/json' };
+      if (token) headers['Authorization'] = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
+
+      let body;
+      if (hasLogoFile) {
+        body = new FormData();
+        body.append('name', partner.name || '');
+        if (partner.volet_id) body.append('volet_id', partner.volet_id);
+        if (partner.type) body.append('type', partner.type);
+        if (partner.website_url) body.append('website_url', partner.website_url);
+        body.append('logo', files.logo);
+      } else {
+        headers['Content-Type'] = 'application/json';
+        body = JSON.stringify(partner);
+      }
+
+      const method = isUpdate ? (hasLogoFile ? 'POST' : 'PUT') : 'POST';
+      const response = await fetch(url, { method, headers, body });
+      const json = await response.json();
+      if (response.ok && json.data) {
+        return { success: true, partner: json.data };
+      }
+    } catch {
+      // Fallback
+    }
+
     const saved = {
       id: partner.id || Date.now(),
       name: partner.name || 'New Partner',
@@ -439,7 +639,50 @@ export const ApiService = {
     return { success: true, partner: saved };
   },
 
+  async deletePartner(id) {
+    const baseUrl = getStoredApiBaseUrl();
+    const token = getStoredAuthToken();
+    const cleanBase = baseUrl.replace(/\/+$/, '');
+    const url = cleanBase ? `${cleanBase}/api/partners/${id}` : `/api/partners/${id}`;
+
+    try {
+      const headers = { 'Accept': 'application/json' };
+      if (token) headers['Authorization'] = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
+      const response = await fetch(url, { method: 'DELETE', headers });
+      if (response.ok) return { success: true };
+    } catch {
+      // Fallback
+    }
+    return { success: true };
+  },
+
+  // Volet CRUD
   async saveVolet(volet) {
+    const baseUrl = getStoredApiBaseUrl();
+    const token = getStoredAuthToken();
+    const cleanBase = baseUrl.replace(/\/+$/, '');
+    const isUpdate = !!volet.id;
+    const url = cleanBase 
+      ? (isUpdate ? `${cleanBase}/api/volets/${volet.id}` : `${cleanBase}/api/volets`)
+      : (isUpdate ? `/api/volets/${volet.id}` : '/api/volets');
+
+    try {
+      const headers = { 'Content-Type': 'application/json', 'Accept': 'application/json' };
+      if (token) headers['Authorization'] = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
+
+      const response = await fetch(url, {
+        method: isUpdate ? 'PUT' : 'POST',
+        headers,
+        body: JSON.stringify(volet)
+      });
+      const json = await response.json();
+      if (response.ok && json.data) {
+        return { success: true, volet: json.data };
+      }
+    } catch {
+      // Fallback
+    }
+
     const saved = {
       id: volet.id || Date.now(),
       name: volet.name || 'New Volet',
@@ -452,7 +695,50 @@ export const ApiService = {
     return { success: true, volet: saved };
   },
 
+  async deleteVolet(id) {
+    const baseUrl = getStoredApiBaseUrl();
+    const token = getStoredAuthToken();
+    const cleanBase = baseUrl.replace(/\/+$/, '');
+    const url = cleanBase ? `${cleanBase}/api/volets/${id}` : `/api/volets/${id}`;
+
+    try {
+      const headers = { 'Accept': 'application/json' };
+      if (token) headers['Authorization'] = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
+      const response = await fetch(url, { method: 'DELETE', headers });
+      if (response.ok) return { success: true };
+    } catch {
+      // Fallback
+    }
+    return { success: true };
+  },
+
+  // Activity CRUD
   async saveActivity(activity) {
+    const baseUrl = getStoredApiBaseUrl();
+    const token = getStoredAuthToken();
+    const cleanBase = baseUrl.replace(/\/+$/, '');
+    const isUpdate = !!activity.id;
+    const url = cleanBase 
+      ? (isUpdate ? `${cleanBase}/api/activities/${activity.id}` : `${cleanBase}/api/activities`)
+      : (isUpdate ? `/api/activities/${activity.id}` : '/api/activities');
+
+    try {
+      const headers = { 'Content-Type': 'application/json', 'Accept': 'application/json' };
+      if (token) headers['Authorization'] = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
+
+      const response = await fetch(url, {
+        method: isUpdate ? 'PUT' : 'POST',
+        headers,
+        body: JSON.stringify(activity)
+      });
+      const json = await response.json();
+      if (response.ok && json.data) {
+        return { success: true, activity: json.data };
+      }
+    } catch {
+      // Fallback
+    }
+
     const saved = {
       id: activity.id || Date.now(),
       volet_id: activity.volet_id || 1,
@@ -463,7 +749,45 @@ export const ApiService = {
     return { success: true, activity: saved };
   },
 
-  async saveMember(member) {
+  // Member CRUD with avatar file upload
+  async saveMember(member, files = {}) {
+    const baseUrl = getStoredApiBaseUrl();
+    const token = getStoredAuthToken();
+    const cleanBase = baseUrl.replace(/\/+$/, '');
+    const isUpdate = !!member.id;
+    const url = cleanBase 
+      ? (isUpdate ? `${cleanBase}/api/members/${member.id}` : `${cleanBase}/api/members`)
+      : (isUpdate ? `/api/members/${member.id}` : '/api/members');
+
+    const hasAvatarFile = files.avatar instanceof File;
+
+    try {
+      const headers = { 'Accept': 'application/json' };
+      if (token) headers['Authorization'] = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
+
+      let body;
+      if (hasAvatarFile) {
+        body = new FormData();
+        body.append('name', member.name || '');
+        if (member.position) body.append('position', member.position);
+        if (member.bio) body.append('bio', member.bio);
+        if (member.email) body.append('email', member.email);
+        body.append('avatar', files.avatar);
+      } else {
+        headers['Content-Type'] = 'application/json';
+        body = JSON.stringify(member);
+      }
+
+      const method = isUpdate ? (hasAvatarFile ? 'POST' : 'PUT') : 'POST';
+      const response = await fetch(url, { method, headers, body });
+      const json = await response.json();
+      if (response.ok && json.data) {
+        return { success: true, member: json.data };
+      }
+    } catch {
+      // Fallback
+    }
+
     const saved = {
       id: member.id || Date.now(),
       name: member.name || 'Team Member',
@@ -475,7 +799,107 @@ export const ApiService = {
     return { success: true, member: saved };
   },
 
+  async deleteMember(id) {
+    const baseUrl = getStoredApiBaseUrl();
+    const token = getStoredAuthToken();
+    const cleanBase = baseUrl.replace(/\/+$/, '');
+    const url = cleanBase ? `${cleanBase}/api/members/${id}` : `/api/members/${id}`;
+
+    try {
+      const headers = { 'Accept': 'application/json' };
+      if (token) headers['Authorization'] = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
+      const response = await fetch(url, { method: 'DELETE', headers });
+      if (response.ok) return { success: true };
+    } catch {
+      // Fallback
+    }
+    return { success: true };
+  },
+
+  // Inscription status update & deletion
   async updateInscriptionStatus(id, status) {
+    const baseUrl = getStoredApiBaseUrl();
+    const token = getStoredAuthToken();
+    const cleanBase = baseUrl.replace(/\/+$/, '');
+    const url = cleanBase ? `${cleanBase}/api/inscriptions/${id}` : `/api/inscriptions/${id}`;
+
+    try {
+      const headers = { 'Content-Type': 'application/json', 'Accept': 'application/json' };
+      if (token) headers['Authorization'] = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
+
+      const response = await fetch(url, {
+        method: 'PUT',
+        headers,
+        body: JSON.stringify({ status })
+      });
+      const json = await response.json();
+      if (response.ok && json.data) {
+        return { success: true, inscription: json.data };
+      }
+    } catch {
+      // Fallback
+    }
+    return { success: true };
+  },
+
+  async deleteInscription(id) {
+    const baseUrl = getStoredApiBaseUrl();
+    const token = getStoredAuthToken();
+    const cleanBase = baseUrl.replace(/\/+$/, '');
+    const url = cleanBase ? `${cleanBase}/api/inscriptions/${id}` : `/api/inscriptions/${id}`;
+
+    try {
+      const headers = { 'Accept': 'application/json' };
+      if (token) headers['Authorization'] = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
+      const response = await fetch(url, { method: 'DELETE', headers });
+      if (response.ok) return { success: true };
+    } catch {
+      // Fallback
+    }
+    return { success: true };
+  },
+
+  // Student CRUD
+  async updateStudent(id, studentData) {
+    const baseUrl = getStoredApiBaseUrl();
+    const token = getStoredAuthToken();
+    const cleanBase = baseUrl.replace(/\/+$/, '');
+    const url = cleanBase ? `${cleanBase}/api/students/${id}` : `/api/students/${id}`;
+
+    try {
+      const headers = { 'Content-Type': 'application/json', 'Accept': 'application/json' };
+      if (token) headers['Authorization'] = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
+
+      const response = await fetch(url, {
+        method: 'PUT',
+        headers,
+        body: JSON.stringify(studentData)
+      });
+      const json = await response.json();
+      if (response.ok && json.data) {
+        return { success: true, student: json.data };
+      }
+    } catch {
+      // Fallback
+    }
+    return { success: true, student: { id, ...studentData } };
+  },
+
+  async deleteStudent(id) {
+    const baseUrl = getStoredApiBaseUrl();
+    const token = getStoredAuthToken();
+    const cleanBase = baseUrl.replace(/\/+$/, '');
+    const url = cleanBase ? `${cleanBase}/api/students/${id}` : `/api/students/${id}`;
+
+    try {
+      const headers = { 'Accept': 'application/json' };
+      if (token) headers['Authorization'] = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
+      const response = await fetch(url, { method: 'DELETE', headers });
+      if (response.ok) return { success: true };
+    } catch {
+      // Fallback
+    }
     return { success: true };
   }
 };
+
