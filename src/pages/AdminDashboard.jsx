@@ -547,15 +547,8 @@ export const AdminDashboard = ({
 
         <div className="pt-4">
           <p className="px-3 mb-2 text-[10px] font-black uppercase tracking-widest text-slate-400">
-            Settings
+            Extra
           </p>
-          <button
-            onClick={() => { onOpenApiSettings(); setSidebarOpen(false); }}
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition cursor-pointer group"
-          >
-            <SlidersHorizontal className="w-4 h-4 text-slate-400 group-hover:text-slate-700" />
-            <span>API Config</span>
-          </button>
           <button
             onClick={() => { navigate('/'); setSidebarOpen(false); }}
             className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition cursor-pointer group"

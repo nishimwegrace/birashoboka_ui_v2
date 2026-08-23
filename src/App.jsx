@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { BrowserRouter, Routes, Route, useNavigate, useLocation, useParams } from 'react-router-dom';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
 import { Header } from './components/Header.jsx';
@@ -21,18 +22,12 @@ import { SEED_VOLETS, SEED_ACTIVITIES, SEED_POSTS, SEED_PARTNERS, SEED_TESTIMONI
   SEED_CAMPAIGNS, SEED_MEMBERS, SEED_STUDENTS, SEED_INSCRIPTIONS 
 } from './data/seedData.js';
 
-export function App() {
-  // Navigation Path
-  const [currentPath, setCurrentPath] = useState(() => {
-    if (typeof window !== 'undefined') {
-      const hash = window.location.hash.replace(/^#/, '');
-      if (hash) return hash;
-      return window.location.pathname || '/';
-    }
-    return '/';
-  });
+function AppContent() {
+  const routerNavigate = useNavigate();
+  const location = useLocation();
 
-  const [searchParams, setSearchParams] = useState('');
+  const currentPath = location.pathname || '/';
+  const searchParams = location.search ? location.search.replace(/^\?/, '') : '';
 
   // Data States
   const [volets, setVolets] = useState(SEED_VOLETS);
@@ -54,21 +49,12 @@ export function App() {
   // Settings Modal State
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
-  // Router handler
+  // Router handler - Clean HTML5 History API navigation
   const navigate = (path) => {
-    let cleanPath = path;
-    let query = '';
-    if (path.includes('?')) {
-      const parts = path.split('?');
-      cleanPath = parts[0];
-      query = parts[1];
-    }
-    setSearchParams(query);
-    setCurrentPath(cleanPath);
     if (typeof window !== 'undefined') {
-      window.location.hash = query ? `${cleanPath}?${query}` : cleanPath;
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
+    routerNavigate(path);
   };
 
   // Initialize AOS (Animate On Scroll)
@@ -88,26 +74,7 @@ export function App() {
       AOS.refresh();
     }, 100);
     return () => clearTimeout(timer);
-  }, [currentPath]);
-
-  // Sync hash changes from browser back/forward buttons
-  useEffect(() => {
-    const handleHashChange = () => {
-      const hashWithQuery = window.location.hash.replace(/^#/, '') || '/';
-      let path = hashWithQuery;
-      let query = '';
-      if (hashWithQuery.includes('?')) {
-        const parts = hashWithQuery.split('?');
-        path = parts[0];
-        query = parts[1];
-      }
-      setCurrentPath(path || '/');
-      setSearchParams(query);
-    };
-
-    window.addEventListener('hashchange', handleHashChange);
-    return () => window.removeEventListener('hashchange', handleHashChange);
-  }, []);
+  }, [location.pathname]);
 
   // Fetch initial data from PHP API (or fallback to seed)
   const loadAllData = async () => {
@@ -162,179 +129,6 @@ export function App() {
     setInscriptions(prev => [{ ...newInscription, student: newStudent }, ...prev]);
   };
 
-  // Route Resolver
-  const renderCurrentPage = () => {
-    // 1. Admin Dashboard Route /admin
-    if (currentPath === '/admin') {
-      if (!currentUser) {
-        return (
-          <AdminLoginPage
-            onLogin={(user) => setCurrentUser(user)}
-            navigate={navigate}
-          />
-        );
-      }
-      return (
-        <AdminDashboard
-          currentUser={currentUser}
-          students={students}
-          inscriptions={inscriptions}
-          campaigns={campaigns}
-          posts={posts}
-          volets={volets}
-          activities={activities}
-          partners={partners}
-          members={members}
-          testimonials={testimonials}
-          onUpdateStudents={setStudents}
-          onUpdateInscriptions={setInscriptions}
-          onUpdateCampaigns={setCampaigns}
-          onUpdatePosts={setPosts}
-          onUpdateVolets={setVolets}
-          onUpdateActivities={setActivities}
-          onUpdatePartners={setPartners}
-          onUpdateMembers={setMembers}
-          onUpdateTestimonials={setTestimonials}
-          onLogout={() => setCurrentUser(null)}
-          navigate={navigate}
-          onOpenApiSettings={() => setIsSettingsOpen(true)}
-        />
-      );
-    }
-
-    if (currentPath === '/admin/login') {
-      return (
-        <AdminLoginPage
-          onLogin={(user) => {
-            setCurrentUser(user);
-            navigate('/admin');
-          }}
-          navigate={navigate}
-        />
-      );
-    }
-
-    // 2. Application & Inscription Route: /apply and /apply/{volet}/{activity}
-    if (currentPath.startsWith('/apply')) {
-      const parts = currentPath.split('/').filter(Boolean);
-      const voletParam = parts[1] || '';
-      const activityParam = parts[2] ? Number(parts[2]) : undefined;
-
-      return (
-        <ApplyPage
-          campaigns={campaigns}
-          volets={volets}
-          activities={activities}
-          initialVoletName={voletParam}
-          initialActivityId={activityParam}
-          navigate={navigate}
-          onStudentEnrolled={handleStudentEnrolled}
-        />
-      );
-    }
-
-    // 3. Program details /program/{name}
-    if (currentPath.startsWith('/program/')) {
-      const voletNameOrId = currentPath.replace('/program/', '');
-      return (
-        <VoletDetailPage
-          voletNameOrId={voletNameOrId}
-          volets={volets}
-          posts={posts}
-          activities={activities}
-          campaigns={campaigns}
-          navigate={navigate}
-        />
-      );
-    }
-
-    // 4. Post details /news/{id}
-    if (currentPath.startsWith('/news/')) {
-      const postId = currentPath.replace('/news/', '');
-      return (
-        <PostDetailPage
-          postId={postId}
-          posts={posts}
-          volets={volets}
-          navigate={navigate}
-        />
-      );
-    }
-
-    // 5. Static & Main Pages
-    switch (currentPath) {
-      case '/about':
-        return (
-          <AboutPage
-            members={members}
-            partners={partners}
-            navigate={navigate}
-          />
-        );
-
-      case '/programs':
-        return (
-          <ProgramsPage
-            volets={volets}
-            activities={activities}
-            campaigns={campaigns}
-            navigate={navigate}
-          />
-        );
-
-      case '/news':
-        return (
-          <NewsPage
-            posts={posts}
-            campaigns={campaigns}
-            volets={volets}
-            activities={activities}
-            navigate={navigate}
-          />
-        );
-
-      case '/gallery':
-        return (
-          <GalleryPage
-            posts={posts}
-            volets={volets}
-            navigate={navigate}
-          />
-        );
-
-      case '/partners':
-        return (
-          <PartnersPage
-            partners={partners}
-            volets={volets}
-            navigate={navigate}
-          />
-        );
-
-      case '/contact':
-        return (
-          <ContactPage
-            navigate={navigate}
-            currentSearch={searchParams}
-          />
-        );
-
-      case '/':
-      default:
-        return (
-          <HomePage
-            posts={posts}
-            partners={partners}
-            testimonials={testimonials}
-            volets={volets}
-            campaigns={campaigns}
-            activities={activities}
-            navigate={navigate}
-          />
-        );
-    }
-  };
-
   const isAdminDashboardView = currentPath === '/admin' && !!currentUser;
 
   return (
@@ -353,7 +147,174 @@ export function App() {
 
       {/* Main Dynamic View */}
       <main className="flex-1 w-full">
-        {renderCurrentPage()}
+        <Routes>
+          <Route path="/" element={
+            <HomePage
+              posts={posts}
+              partners={partners}
+              testimonials={testimonials}
+              volets={volets}
+              campaigns={campaigns}
+              activities={activities}
+              navigate={navigate}
+            />
+          } />
+
+          <Route path="/about" element={
+            <AboutPage
+              members={members}
+              partners={partners}
+              navigate={navigate}
+            />
+          } />
+
+          <Route path="/programs" element={
+            <ProgramsPage
+              volets={volets}
+              activities={activities}
+              campaigns={campaigns}
+              navigate={navigate}
+            />
+          } />
+
+          <Route path="/program/:voletNameOrId" element={
+            <VoletDetailPageWrapper
+              volets={volets}
+              posts={posts}
+              activities={activities}
+              campaigns={campaigns}
+              navigate={navigate}
+            />
+          } />
+
+          <Route path="/news" element={
+            <NewsPage
+              posts={posts}
+              campaigns={campaigns}
+              volets={volets}
+              activities={activities}
+              navigate={navigate}
+            />
+          } />
+
+          <Route path="/news/:postId" element={
+            <PostDetailPageWrapper
+              posts={posts}
+              volets={volets}
+              navigate={navigate}
+            />
+          } />
+
+          <Route path="/gallery" element={
+            <GalleryPage
+              posts={posts}
+              volets={volets}
+              navigate={navigate}
+            />
+          } />
+
+          <Route path="/partners" element={
+            <PartnersPage
+              partners={partners}
+              volets={volets}
+              navigate={navigate}
+            />
+          } />
+
+          <Route path="/contact" element={
+            <ContactPage
+              navigate={navigate}
+              currentSearch={searchParams}
+            />
+          } />
+
+          <Route path="/apply" element={
+            <ApplyPage
+              campaigns={campaigns}
+              volets={volets}
+              activities={activities}
+              navigate={navigate}
+              onStudentEnrolled={handleStudentEnrolled}
+            />
+          } />
+
+          <Route path="/apply/:voletName" element={
+            <ApplyPageWrapper
+              campaigns={campaigns}
+              volets={volets}
+              activities={activities}
+              navigate={navigate}
+              onStudentEnrolled={handleStudentEnrolled}
+            />
+          } />
+
+          <Route path="/apply/:voletName/:activityId" element={
+            <ApplyPageWrapper
+              campaigns={campaigns}
+              volets={volets}
+              activities={activities}
+              navigate={navigate}
+              onStudentEnrolled={handleStudentEnrolled}
+            />
+          } />
+
+          <Route path="/admin" element={
+            !currentUser ? (
+              <AdminLoginPage
+                onLogin={(user) => setCurrentUser(user)}
+                navigate={navigate}
+              />
+            ) : (
+              <AdminDashboard
+                currentUser={currentUser}
+                students={students}
+                inscriptions={inscriptions}
+                campaigns={campaigns}
+                posts={posts}
+                volets={volets}
+                activities={activities}
+                partners={partners}
+                members={members}
+                testimonials={testimonials}
+                onUpdateStudents={setStudents}
+                onUpdateInscriptions={setInscriptions}
+                onUpdateCampaigns={setCampaigns}
+                onUpdatePosts={setPosts}
+                onUpdateVolets={setVolets}
+                onUpdateActivities={setActivities}
+                onUpdatePartners={setPartners}
+                onUpdateMembers={setMembers}
+                onUpdateTestimonials={setTestimonials}
+                onLogout={() => setCurrentUser(null)}
+                navigate={navigate}
+                onOpenApiSettings={() => setIsSettingsOpen(true)}
+              />
+            )
+          } />
+
+          <Route path="/admin/login" element={
+            <AdminLoginPage
+              onLogin={(user) => {
+                setCurrentUser(user);
+                navigate('/admin');
+              }}
+              navigate={navigate}
+            />
+          } />
+
+          {/* Catch-all fallback */}
+          <Route path="*" element={
+            <HomePage
+              posts={posts}
+              partners={partners}
+              testimonials={testimonials}
+              volets={volets}
+              campaigns={campaigns}
+              activities={activities}
+              navigate={navigate}
+            />
+          } />
+        </Routes>
       </main>
 
       {/* Footer */}
@@ -369,6 +330,56 @@ export function App() {
         isApiLive={isApiLive}
       />
     </div>
+  );
+}
+
+// Params Wrappers
+function VoletDetailPageWrapper({ volets, posts, activities, campaigns, navigate }) {
+  const { voletNameOrId } = useParams();
+  return (
+    <VoletDetailPage
+      voletNameOrId={decodeURIComponent(voletNameOrId || '')}
+      volets={volets}
+      posts={posts}
+      activities={activities}
+      campaigns={campaigns}
+      navigate={navigate}
+    />
+  );
+}
+
+function PostDetailPageWrapper({ posts, volets, navigate }) {
+  const { postId } = useParams();
+  return (
+    <PostDetailPage
+      postId={postId}
+      posts={posts}
+      volets={volets}
+      navigate={navigate}
+    />
+  );
+}
+
+function ApplyPageWrapper({ campaigns, volets, activities, navigate, onStudentEnrolled }) {
+  const { voletName, activityId } = useParams();
+  return (
+    <ApplyPage
+      campaigns={campaigns}
+      volets={volets}
+      activities={activities}
+      initialVoletName={decodeURIComponent(voletName || '')}
+      initialActivityId={activityId ? Number(activityId) : undefined}
+      navigate={navigate}
+      onStudentEnrolled={onStudentEnrolled}
+    />
+  );
+}
+
+export function App() {
+  return (
+    <BrowserRouter>
+      <AppContent />
+    </BrowserRouter>
   );
 }
 
