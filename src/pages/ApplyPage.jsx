@@ -20,7 +20,8 @@ import {
   Briefcase,
   Layers,
   ChevronRight,
-  HomeIcon
+  HomeIcon,
+  ArrowLeft
 } from 'lucide-react';
 import { ApiService } from '../services/api.js';
 
@@ -302,33 +303,36 @@ export const ApplyPage = ({
 
             {/* Section 2: Ongoing Campaign Highlight Card */}
             {activeCampaign && (
-              <div className="bg-gradient-to-r from-blue-900 via-indigo-900 to-slate-900 rounded-3xl p-6 sm:p-8 text-white shadow-xl border border-indigo-700/40 relative overflow-hidden">
+              <div className="bg-white rounded-3xl p-6 sm:p-8 text-slate-900 shadow-xl border border-slate-200 relative overflow-hidden">
                 <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
                   <div className="space-y-2.5 max-w-2xl">
                     <div className="flex flex-wrap items-center gap-2">
-                      <span className="px-3 py-1 rounded-full bg-amber-400 text-slate-250 text-xs font-black uppercase tracking-wider">
-                        Target Cohort · {activeCampaign.edition}
+                      <span className="px-3 py-1 rounded-full bg-amber-400 text-slate-900 text-xs font-black uppercase tracking-wider">
+                        {activeCampaign.edition}
                       </span>
-                      <span className="text-xs text-blue-200 font-medium">
+                      <span className="text-xs text-slate-500 font-medium">
                         {activeCampaign.place}
                       </span>
-                      {openCampaigns.length > 1 && (
-                        <button
-                          type="button"
-                          onClick={() => setCampaignConfirmed(false)}
-                          className="text-xs text-blue-200 underline underline-offset-2 hover:text-white font-semibold cursor-pointer"
-                        >
-                          Change campaign
-                        </button>
-                      )}
+                      <div>
+                        {openCampaigns.length > 1 && (
+                          <button
+                            type="button"
+                            onClick={() => setCampaignConfirmed(false)}
+                            className="text-xs text-slate-700 underline underline-offset-2 hover:text-blue-900 font-semibold cursor-pointer"
+                          >
+                            <ArrowLeft className="w-3.5 h-3.5 inline-block mr-1" />
+                            Back to choose campaign
+                          </button>
+                        )}
+                        </div>
                     </div>
-                    <h2 className="text-2xl sm:text-3xl font-extrabold text-white">
+                    <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight leading-tight">
                       {activeCampaign.title}
                     </h2>
-                    <p className="text-sm sm:text-base text-slate-200 font-normal leading-relaxed">
+                    <p className="text-sm sm:text-base text-slate-600 font-normal leading-relaxed">
                       {activeCampaign.description}
                     </p>
-                    <div className="flex flex-wrap gap-4 text-xs text-blue-200 pt-2">
+                    <div className="flex flex-wrap gap-4 text-xs pt-2">
                       {activeCampaign.registration_end && (
                         <div className="flex items-center gap-1.5">
                           <Calendar className="w-4 h-4 text-amber-300" />
@@ -345,11 +349,11 @@ export const ApplyPage = ({
                   </div>
 
                   <div className="shrink-0 bg-white/10 backdrop-blur-md rounded-2xl p-5 border border-white/20 text-center">
-                    <span className="text-xs text-slate-300 uppercase tracking-wider font-semibold block">Available Seats</span>
-                    <span className="text-3xl font-black text-amber-300 block my-1">
-                      {activeCampaign.quota || 50}
+                    <span className="text-xs text-slate-600 uppercase tracking-wider font-semibold block">Available Seats</span>
+                    <span className="text-3xl font-black text-amber-700 block my-1">
+                      {activeCampaign.quota}
                     </span>
-                    <span className="text-xs text-slate-300">Free Full Sponsorship</span>
+                    <span className="text-xs text-slate-600">Free Full Sponsorship</span>
                   </div>
                 </div>
               </div>
@@ -462,104 +466,6 @@ export const ApplyPage = ({
                     <span>{errorMessage}</span>
                   </div>
                 )}
-
-                {/* Campaign & Program Information (Specified by Admin on Campaign Creation) */}
-                <div className="rounded-2xl bg-gradient-to-br from-slate-900 via-indigo-950 to-blue-950 text-white p-5 sm:p-7 shadow-md border border-indigo-800/40 space-y-4">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-indigo-800/60">
-                    <div className="flex items-center gap-2.5">
-                      <span className="p-2 rounded-xl bg-blue-500/20 text-blue-300 border border-blue-400/30">
-                        <Layers className="w-5 h-5" />
-                      </span>
-                      <div>
-                        <span className="text-[11px] font-extrabold uppercase tracking-widest text-amber-400 block">
-                          Assigned Program & Vocational Trade
-                        </span>
-                        <h3 className="text-base sm:text-lg font-bold text-white">
-                          {activeCampaign?.title || 'Vocational Admissions Cohort'}
-                        </h3>
-                      </div>
-                    </div>
-
-                    {openCampaigns.length > 1 && (
-                      <button
-                        type="button"
-                        onClick={() => setCampaignConfirmed(false)}
-                        className="text-xs text-blue-200 underline underline-offset-2 hover:text-white font-semibold shrink-0 cursor-pointer"
-                      >
-                        Change campaign
-                      </button>
-                    )}
-                  </div>
-
-                  {/* Read-Only Campaign & Volet/Activity details card */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-xs">
-                    <div className="p-3.5 rounded-xl bg-white/5 border border-white/10 space-y-1">
-                      <span className="text-slate-400 font-medium uppercase tracking-wider text-[10px] block">
-                        Admission Campaign
-                      </span>
-                      <div className="font-bold text-sm text-amber-300">
-                        {activeCampaign?.edition || 'New Cohort'}
-                      </div>
-                      <div className="text-slate-300 text-[11px]">
-                        {activeCampaign?.title}
-                      </div>
-                    </div>
-
-                    <div className="p-3.5 rounded-xl bg-white/5 border border-white/10 space-y-1">
-                      <span className="text-slate-400 font-medium uppercase tracking-wider text-[10px] block">
-                        Volet de Formation
-                      </span>
-                      <div className="font-bold text-sm text-blue-200">
-                        {currentVolet?.name || 'CRBN'}
-                      </div>
-                      <div className="text-slate-300 text-[11px] line-clamp-1">
-                        {currentVolet?.subtitle || currentVolet?.slogan || 'Centre de Réhabilitation Birashoboka'}
-                      </div>
-                    </div>
-
-                    <div className="p-3.5 rounded-xl bg-white/5 border border-white/10 space-y-1 sm:col-span-2 lg:col-span-1">
-                      <span className="text-slate-400 font-medium uppercase tracking-wider text-[10px] block">
-                        Specific Vocational Trade / Activity
-                      </span>
-                      <div className="font-bold text-sm text-emerald-300">
-                        {currentActivity?.title || 'Vocational Trade & Therapy'}
-                      </div>
-                      <div className="text-slate-300 text-[11px] line-clamp-2">
-                        {currentActivity?.description || 'Hands-on training, starter kits & psychosocial counseling.'}
-                      </div>
-                    </div>
-
-                    <div className="p-3.5 rounded-xl bg-white/5 border border-white/10 space-y-1">
-                      <span className="text-slate-400 font-medium uppercase tracking-wider text-[10px] block">
-                        Training Center Location
-                      </span>
-                      <div className="font-semibold text-slate-100 flex items-center gap-1.5">
-                        <MapPin className="w-3.5 h-3.5 text-rose-400 shrink-0" />
-                        <span>{activeCampaign?.place || 'CRBN Campus — Ngozi (Rusuguti)'}</span>
-                      </div>
-                    </div>
-
-                    <div className="p-3.5 rounded-xl bg-white/5 border border-white/10 space-y-1">
-                      <span className="text-slate-400 font-medium uppercase tracking-wider text-[10px] block">
-                        Preferred Time Slot / Schedule
-                      </span>
-                      <div className="font-semibold text-slate-100 flex items-center gap-1.5">
-                        <Clock className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-                        <span>Morning Cohort (08:00 - 12:00)</span>
-                      </div>
-                    </div>
-
-                    <div className="p-3.5 rounded-xl bg-white/5 border border-white/10 space-y-1">
-                      <span className="text-slate-400 font-medium uppercase tracking-wider text-[10px] block">
-                        Registration Window & Quota
-                      </span>
-                      <div className="font-semibold text-slate-100 flex items-center gap-1.5">
-                        <Calendar className="w-3.5 h-3.5 text-blue-400 shrink-0" />
-                        <span>Open (Quota: {activeCampaign?.quota || 50} Beneficiaries)</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
 
                 {/* Student Personal & Demographic Details (Student fills only info related to them) */}
                 <div className="space-y-4 pt-2">
