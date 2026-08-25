@@ -173,7 +173,7 @@ export const Header = ({
                           <div
                             key={volet.id}
                             onMouseEnter={() => setHoveredVoletId(volet.id)}
-                            onClick={() => handleNavClick(`/program/${encodeURIComponent(volet.name)}`)}
+                            onClick={() => handleNavClick(`/program/${encodeURIComponent(volet.name.toLowerCase())}`)}
                             className={`p-3 rounded-xl transition cursor-pointer text-left ${
                               isHovered 
                                 ? 'bg-blue-50 border border-blue-200' 
@@ -185,7 +185,7 @@ export const Header = ({
                                 {volet.name}
                               </span>
                               <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-white text-slate-600 border border-slate-200">
-                                {volet.target === 'women' ? 'Women & Girls' : 'Open to All'}
+                                {volet.target.charAt(0).toUpperCase() + volet.target.slice(1)}
                               </span>
                             </div>
                             <p className="text-xs text-slate-500 line-clamp-1 mt-1 font-normal">

@@ -198,7 +198,7 @@ export const VoletDetailPage = ({
               <div className="space-y-2">
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 text-xs font-bold uppercase tracking-wider">
                 </div>
-                <h3 className="text-2xl font-extrabold">{voletCampaigns[0].title}</h3>
+                <h3 className="text-2xl text-white font-extrabold">{voletCampaigns[0].title}</h3>
                 <p className="text-xs sm:text-sm text-emerald-100 max-w-2xl">{voletCampaigns[0].description}</p>
                 <div className="text-xs text-white/90 pt-1">
                   <strong>Registration:</strong> {voletCampaigns[0].registration_start} to {voletCampaigns[0].registration_end} · <strong>Location:</strong> {voletCampaigns[0].place}

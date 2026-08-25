@@ -159,12 +159,6 @@ export const PostDetailPage = ({
                 <p className="text-lg font-medium text-slate-800 leading-relaxed">
                   {currentPost.description}
                 </p>
-                <p>
-                  At Birashoboka Center, each training milestone represents a tangible step toward community resilience in Burundi. Beneficiaries receive continuous hands-on apprenticeship combined with tailored psychosocial counseling to guarantee long-term success.
-                </p>
-                <p>
-                  Through institutional collaborations with local community leaders, donors, and the Ministry of Public Health, our teams in Ngozi and Bujumbura ensure inclusive environments where vulnerable young women and marginalized youth regain their autonomy and dignity.
-                </p>
               </div>
 
               {/* Program Callout Box inside post */}
