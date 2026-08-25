@@ -127,7 +127,7 @@ export const GalleryPage = ({ posts, volets, navigate }) => {
                 <span className="text-[10px] font-bold uppercase tracking-wider text-blue-300 mb-1">
                   {item.post.volet?.name || 'Birashoboka'}
                 </span>
-                <h4 className="text-xs sm:text-sm font-bold line-clamp-2 leading-snug">
+                <h4 className="text-xs sm:text-sm text-white font-bold line-clamp-2 leading-snug">
                   {item.post.title}
                 </h4>
                 <div className="mt-2.5 flex items-center gap-1 text-xs text-blue-400 font-bold">

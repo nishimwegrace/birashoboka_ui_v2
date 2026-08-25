@@ -229,7 +229,7 @@ console.log(openCampaigns, 'openCampaigns');
             <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
               <div className="space-y-2.5 max-w-2xl">
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className="px-3 py-1 rounded-full bg-amber-400 text-slate-950 text-xs font-black uppercase tracking-wider">
+                  <span className="px-3 py-1 rounded-full bg-amber-400 text-slate-250 text-xs font-black uppercase tracking-wider">
                     Target Cohort · {activeCampaign.edition}
                   </span>
                   <span className="text-xs text-blue-200 font-medium">

@@ -103,9 +103,6 @@ export const NewsPage = ({
           {/* Banner content */}
           <div className="relative z-10 max-w-7xl mx-auto h-full px-4 sm:px-6 lg:px-8 flex flex-col justify-end pb-12">
             <div className="max-w-2xl text-white space-y-3">
-              <span className="px-3 py-1 rounded-full bg-blue-600 text-white text-xs font-bold uppercase tracking-wider">
-                Breaking Update · {carouselPosts[activeBannerIndex]?.volet?.name || 'Birashoboka'}
-              </span>
               <h2 
                 onClick={() => navigate(`/news/${carouselPosts[activeBannerIndex]?.id}`)}
                 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-white tracking-tight cursor-pointer hover:text-blue-200 transition line-clamp-2"

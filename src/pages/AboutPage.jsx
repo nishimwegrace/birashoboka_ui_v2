@@ -244,7 +244,7 @@ export const AboutPage = ({ members, partners, navigate }) => {
 
         {/* Bottom Call to Action */}
         <section data-aos="fade-up" data-aos-duration="600" className="text-center p-10 rounded-3xl bg-gradient-to-r from-blue-600 to-indigo-700 text-white shadow-xl">
-          <h3 className="text-2xl sm:text-3xl font-extrabold">Ready to Support or Join Our Programs?</h3>
+          <h3 className="text-2xl sm:text-3xl font-extrabold text-slate-100">Ready to Support or Join Our Programs?</h3>
           <p className="text-blue-100 text-sm sm:text-base mt-2 max-w-xl mx-auto">
             Explore our open training cohorts or get in touch to propose institutional partnerships.
           </p>

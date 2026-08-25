@@ -166,7 +166,7 @@ export const VoletDetailPage = ({
                 Program Mission & Scope
               </span>
               <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900">
-                About the {volet.name} Curriculum
+                About the {volet.name}
               </h2>
               <p className="text-slate-600 text-base leading-relaxed">
                 {volet.description}
@@ -218,7 +218,7 @@ export const VoletDetailPage = ({
         <section className="space-y-8">
           <div>
             <span className="text-xs font-bold uppercase tracking-wider text-blue-600">
-              Curriculum Modules & Services
+              Modules & Services
             </span>
             <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight mt-1">
               Practical Activities in {volet.name}

@@ -9,6 +9,7 @@ import {
   MessageCircle,
   ExternalLink
 } from 'lucide-react';
+import logo_birashoboka from '../assets/birashoboka_logo.png';
 
 export const Footer = ({ navigate }) => {
   const currentYear = new Date().getFullYear();
@@ -23,8 +24,8 @@ export const Footer = ({ navigate }) => {
             onClick={() => navigate('/')} 
             className="flex items-center gap-2.5 text-left group focus:outline-hidden"
           >
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-600 text-white font-bold text-sm">
-              B
+            <div className="flex items-center justify-center">
+              <img src={logo_birashoboka} alt="Birashoboka Logo" className="h-16 w-16 object-contain" />
             </div>
             <div className="flex items-center gap-2">
               <span className="text-sm font-bold text-white tracking-tight group-hover:text-blue-400 transition">
@@ -45,22 +46,13 @@ export const Footer = ({ navigate }) => {
         {/* Right: Social Links Only */}
         <div className="flex items-center gap-4">
           <a
-            href="https://facebook.com"
+            href="https://www.facebook.com/TheChrisLyricureYouth"
             target="_blank"
             rel="noopener noreferrer"
             className="text-slate-400 hover:text-blue-400 transition p-1.5 rounded-full hover:bg-slate-800"
             aria-label="Facebook"
           >
             <Facebook className="w-4 h-4" />
-          </a>
-          <a
-            href="https://twitter.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-slate-400 hover:text-sky-400 transition p-1.5 rounded-full hover:bg-slate-800"
-            aria-label="Twitter / X"
-          >
-            <Twitter className="w-4 h-4" />
           </a>
           <a
             href="https://instagram.com"
@@ -72,7 +64,7 @@ export const Footer = ({ navigate }) => {
             <Instagram className="w-4 h-4" />
           </a>
           <a
-            href="https://youtube.com"
+            href="https://www.youtube.com/@CRBN-NM"
             target="_blank"
             rel="noopener noreferrer"
             className="text-slate-400 hover:text-red-400 transition p-1.5 rounded-full hover:bg-slate-800"
@@ -90,7 +82,7 @@ export const Footer = ({ navigate }) => {
             <MessageCircle className="w-4 h-4" />
           </a>
           <a
-            href="mailto:contact@birashoboka.org"
+            href="mailto:centrebirashoboka@gmail.com"
             className="text-slate-400 hover:text-blue-300 transition p-1.5 rounded-full hover:bg-slate-800"
             aria-label="Email"
           >

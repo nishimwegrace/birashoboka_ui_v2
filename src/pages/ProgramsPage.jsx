@@ -30,7 +30,7 @@ export const ProgramsPage = ({
           <div className="max-w-3xl">
             <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-600/30 text-blue-300 text-xs font-bold uppercase tracking-wider border border-blue-500/30 mb-4">
               <BookOpen className="w-3.5 h-3.5" />
-              Vocational & Psychosocial Curriculum
+              Vocational & Psychosocial
             </span>
             <h1 className="text-3xl sm:text-5xl font-extrabold text-white tracking-tight">
               Our Training Programs & Volets
@@ -86,7 +86,7 @@ export const ProgramsPage = ({
                   {/* Included Activities list */}
                   <div className="mt-6 pt-4 border-t border-slate-100">
                     <div className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">
-                      Key Curriculum Modules:
+                      Key Modules:
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                       {voletActs.slice(0, 6).map((act) => (
