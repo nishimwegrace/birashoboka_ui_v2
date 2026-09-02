@@ -12,7 +12,7 @@ import {
   ArrowRight,
   GraduationCap
 } from 'lucide-react';
-
+import team from "../assets/team.png";
 export const AboutPage = ({ members, partners, navigate }) => {
   const coreValues = [
     {
@@ -94,7 +94,7 @@ export const AboutPage = ({ members, partners, navigate }) => {
           <div className="lg:col-span-6">
             <div className="relative rounded-3xl overflow-hidden shadow-xl border-4 border-white bg-slate-200 aspect-4/3">
               <img
-                src="https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&w=1000&q=80"
+                src={team}
                 alt="Birashoboka Center training session"
                 className="w-full h-full object-cover"
               />
