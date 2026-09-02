@@ -32,9 +32,38 @@ import {
   Settings,
   AlertCircle,
   MessageSquare,
-  Star
+  Star,
+  Loader2
 } from 'lucide-react';
 import { ApiService } from '../services/api.js';
+
+const SaveErrorBanner = ({ message }) => {
+  if (!message) return null;
+  return (
+    <div className="flex items-start gap-2.5 p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-medium">
+      <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+      <span>{message}</span>
+    </div>
+  );
+};
+
+const SubmitButton = ({ saving, children, ...props }) => (
+  <button
+    type="submit"
+    disabled={saving}
+    className="inline-flex items-center gap-2 px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed text-white text-xs font-bold cursor-pointer shadow-md shadow-blue-600/20"
+    {...props}
+  >
+    {saving ? (
+      <>
+        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+        Saving...
+      </>
+    ) : (
+      children
+    )}
+  </button>
+);
 
 export const AdminDashboard = ({
   currentUser,
@@ -106,10 +135,19 @@ export const AdminDashboard = ({
 
   // Success toast message
   const [notification, setNotification] = useState(null);
+  // Per-form loading indicator (which entity is being saved)
+  const [savingEntity, setSavingEntity] = useState(null);
+  // Inline error message for the currently open modal
+  const [formError, setFormError] = useState(null);
 
   const showNotification = (msg) => {
     setNotification(msg);
     setTimeout(() => setNotification(null), 3500);
+  };
+
+  const showError = (msg) => {
+    setFormError(msg);
+    setTimeout(() => setFormError(null), 6000);
   };
 
   // Sidebar nav items
@@ -258,19 +296,31 @@ export const AdminDashboard = ({
     e.preventDefault();
     if (!editingCampaign?.title || !editingCampaign.edition) return;
 
-    const res = await ApiService.saveCampaign(editingCampaign);
-    const saved = res.campaign || editingCampaign;
+    setSavingEntity('campaign');
+    setFormError(null);
+    try {
+      const res = await ApiService.saveCampaign(editingCampaign);
+      if (res.success === false) {
+        showError(res.message || 'Failed to save the campaign.');
+        return;
+      }
+      const saved = res.campaign || editingCampaign;
 
-    if (editingCampaign.id) {
-      const updated = campaigns.map(c => c.id === editingCampaign.id ? { ...c, ...saved } : c);
-      onUpdateCampaigns(updated);
-      showNotification('Campaign updated successfully!');
-    } else {
-      onUpdateCampaigns([saved, ...campaigns]);
-      showNotification('New training campaign created!');
+      if (editingCampaign.id) {
+        const updated = campaigns.map(c => c.id === editingCampaign.id ? { ...c, ...saved } : c);
+        onUpdateCampaigns(updated);
+        showNotification('Campaign updated successfully!');
+      } else {
+        onUpdateCampaigns([saved, ...campaigns]);
+        showNotification('New training campaign created!');
+      }
+      setCampaignModalOpen(false);
+      setEditingCampaign(null);
+    } catch (err) {
+      showError(err?.message || 'An unexpected error occurred while saving the campaign.');
+    } finally {
+      setSavingEntity(null);
     }
-    setCampaignModalOpen(false);
-    setEditingCampaign(null);
   };
 
   const handleDeleteCampaign = async (id) => {
@@ -291,21 +341,33 @@ export const AdminDashboard = ({
       image_urls: galleryImageFiles
     };
 
-    const res = await ApiService.savePost(editingPost, files);
-    const saved = res.post || editingPost;
+    setSavingEntity('post');
+    setFormError(null);
+    try {
+      const res = await ApiService.savePost(editingPost, files);
+      if (res.success === false) {
+        showError(res.message || 'Failed to save the article.');
+        return;
+      }
+      const saved = res.post || editingPost;
 
-    if (editingPost.id) {
-      const updated = posts.map(p => p.id === editingPost.id ? { ...p, ...saved } : p);
-      onUpdatePosts(updated);
-      showNotification('Article updated successfully!');
-    } else {
-      onUpdatePosts([saved, ...posts]);
-      showNotification('New article published!');
+      if (editingPost.id) {
+        const updated = posts.map(p => p.id === editingPost.id ? { ...p, ...saved } : p);
+        onUpdatePosts(updated);
+        showNotification('Article updated successfully!');
+      } else {
+        onUpdatePosts([saved, ...posts]);
+        showNotification('New article published!');
+      }
+      setPostModalOpen(false);
+      setEditingPost(null);
+      setFeaturedImageFile(null);
+      setGalleryImageFiles([]);
+    } catch (err) {
+      showError(err?.message || 'An unexpected error occurred while saving the article.');
+    } finally {
+      setSavingEntity(null);
     }
-    setPostModalOpen(false);
-    setEditingPost(null);
-    setFeaturedImageFile(null);
-    setGalleryImageFiles([]);
   };
 
   const handleDeletePost = async (id) => {
@@ -321,20 +383,32 @@ export const AdminDashboard = ({
     e.preventDefault();
     if (!editingVolet?.name) return;
 
-    const res = await ApiService.saveVolet(editingVolet, { carousel_images: voletCarouselFiles });
-    const saved = res.volet || editingVolet;
+    setSavingEntity('volet');
+    setFormError(null);
+    try {
+      const res = await ApiService.saveVolet(editingVolet, { carousel_images: voletCarouselFiles });
+      if (res.success === false) {
+        showError(res.message || 'Failed to save the volet.');
+        return;
+      }
+      const saved = res.volet || editingVolet;
 
-    if (editingVolet.id) {
-      const updated = volets.map(v => v.id === editingVolet.id ? { ...v, ...saved } : v);
-      onUpdateVolets(updated);
-      showNotification('Volet updated!');
-    } else {
-      onUpdateVolets([...volets, saved]);
-      showNotification('New Volet created!');
+      if (editingVolet.id) {
+        const updated = volets.map(v => v.id === editingVolet.id ? { ...v, ...saved } : v);
+        onUpdateVolets(updated);
+        showNotification('Volet updated!');
+      } else {
+        onUpdateVolets([...volets, saved]);
+        showNotification('New Volet created!');
+      }
+      setVoletModalOpen(false);
+      setEditingVolet(null);
+      setVoletCarouselFiles([]);
+    } catch (err) {
+      showError(err?.message || 'An unexpected error occurred while saving the volet.');
+    } finally {
+      setSavingEntity(null);
     }
-    setVoletModalOpen(false);
-    setEditingVolet(null);
-    setVoletCarouselFiles([]);
   };
 
   const handleDeleteVolet = async (id) => {
@@ -350,19 +424,31 @@ export const AdminDashboard = ({
     e.preventDefault();
     if (!editingActivity?.title) return;
 
-    const res = await ApiService.saveActivity(editingActivity);
-    const saved = res.activity || editingActivity;
+    setSavingEntity('activity');
+    setFormError(null);
+    try {
+      const res = await ApiService.saveActivity(editingActivity);
+      if (res.success === false) {
+        showError(res.message || 'Failed to save the activity.');
+        return;
+      }
+      const saved = res.activity || editingActivity;
 
-    if (editingActivity.id) {
-      const updated = activities.map(a => a.id === editingActivity.id ? { ...a, ...saved } : a);
-      onUpdateActivities(updated);
-      showNotification('Activity updated!');
-    } else {
-      onUpdateActivities([...activities, saved]);
-      showNotification('New Activity added!');
+      if (editingActivity.id) {
+        const updated = activities.map(a => a.id === editingActivity.id ? { ...a, ...saved } : a);
+        onUpdateActivities(updated);
+        showNotification('Activity updated!');
+      } else {
+        onUpdateActivities([...activities, saved]);
+        showNotification('New Activity added!');
+      }
+      setActivityModalOpen(false);
+      setEditingActivity(null);
+    } catch (err) {
+      showError(err?.message || 'An unexpected error occurred while saving the activity.');
+    } finally {
+      setSavingEntity(null);
     }
-    setActivityModalOpen(false);
-    setEditingActivity(null);
   };
 
   // Save Partner Modal
@@ -371,27 +457,39 @@ export const AdminDashboard = ({
     if (!editingPartner?.name) return;
 
     const files = { logo: partnerLogoFile };
-    const res = await ApiService.savePartner(editingPartner, files);
-    const saved = res.partner || editingPartner;
+    setSavingEntity('partner');
+    setFormError(null);
+    try {
+      const res = await ApiService.savePartner(editingPartner, files);
+      if (res.success === false) {
+        showError(res.message || 'Failed to save the partner.');
+        return;
+      }
+      const saved = res.partner || editingPartner;
 
-    const matchedVolet = volets.find(v => String(v.id) === String(saved.volet_id || editingPartner.volet_id));
-    const enrichedPartner = {
-      ...saved,
-      volet_id: saved.volet_id !== undefined ? saved.volet_id : (editingPartner.volet_id || null),
-      volet: matchedVolet || saved.volet || null
-    };
+      const matchedVolet = volets.find(v => String(v.id) === String(saved.volet_id || editingPartner.volet_id));
+      const enrichedPartner = {
+        ...saved,
+        volet_id: saved.volet_id !== undefined ? saved.volet_id : (editingPartner.volet_id || null),
+        volet: matchedVolet || saved.volet || null
+      };
 
-    if (editingPartner.id) {
-      const updated = partners.map(p => p.id === editingPartner.id ? { ...p, ...enrichedPartner } : p);
-      onUpdatePartners(updated);
-      showNotification('Partner updated!');
-    } else {
-      onUpdatePartners([...partners, enrichedPartner]);
-      showNotification('New Partner added!');
+      if (editingPartner.id) {
+        const updated = partners.map(p => p.id === editingPartner.id ? { ...p, ...enrichedPartner } : p);
+        onUpdatePartners(updated);
+        showNotification('Partner updated!');
+      } else {
+        onUpdatePartners([...partners, enrichedPartner]);
+        showNotification('New Partner added!');
+      }
+      setPartnerModalOpen(false);
+      setEditingPartner(null);
+      setPartnerLogoFile(null);
+    } catch (err) {
+      showError(err?.message || 'An unexpected error occurred while saving the partner.');
+    } finally {
+      setSavingEntity(null);
     }
-    setPartnerModalOpen(false);
-    setEditingPartner(null);
-    setPartnerLogoFile(null);
   };
 
   const handleDeletePartner = async (id) => {
@@ -408,20 +506,32 @@ export const AdminDashboard = ({
     if (!editingMember?.name || !editingMember.position) return;
 
     const files = { avatar: memberAvatarFile };
-    const res = await ApiService.saveMember(editingMember, files);
-    const saved = res.member || editingMember;
+    setSavingEntity('member');
+    setFormError(null);
+    try {
+      const res = await ApiService.saveMember(editingMember, files);
+      if (res.success === false) {
+        showError(res.message || 'Failed to save the team member.');
+        return;
+      }
+      const saved = res.member || editingMember;
 
-    if (editingMember.id) {
-      const updated = members.map(m => m.id === editingMember.id ? { ...m, ...saved } : m);
-      onUpdateMembers(updated);
-      showNotification('Team member updated!');
-    } else {
-      onUpdateMembers([...members, saved]);
-      showNotification('New team member added!');
+      if (editingMember.id) {
+        const updated = members.map(m => m.id === editingMember.id ? { ...m, ...saved } : m);
+        onUpdateMembers(updated);
+        showNotification('Team member updated!');
+      } else {
+        onUpdateMembers([...members, saved]);
+        showNotification('New team member added!');
+      }
+      setMemberModalOpen(false);
+      setEditingMember(null);
+      setMemberAvatarFile(null);
+    } catch (err) {
+      showError(err?.message || 'An unexpected error occurred while saving the team member.');
+    } finally {
+      setSavingEntity(null);
     }
-    setMemberModalOpen(false);
-    setEditingMember(null);
-    setMemberAvatarFile(null);
   };
 
   const handleDeleteMember = async (id) => {
@@ -438,19 +548,31 @@ export const AdminDashboard = ({
     if (!editingTestimonial?.name || !editingTestimonial?.content) return;
 
     const files = { photo: testimonialPhotoFile };
-    const res = await ApiService.saveTestimonial(editingTestimonial, files);
-    const saved = res.testimonial || editingTestimonial;
+    setSavingEntity('testimonial');
+    setFormError(null);
+    try {
+      const res = await ApiService.saveTestimonial(editingTestimonial, files);
+      if (res.success === false) {
+        showError(res.message || 'Failed to save the testimonial.');
+        return;
+      }
+      const saved = res.testimonial || editingTestimonial;
 
-    if (editingTestimonial.id) {
-      onUpdateTestimonials(testimonials.map(t => t.id === editingTestimonial.id ? { ...t, ...saved } : t));
-      showNotification('Testimonial updated!');
-    } else {
-      onUpdateTestimonials([...testimonials, saved]);
-      showNotification('New testimonial added!');
+      if (editingTestimonial.id) {
+        onUpdateTestimonials(testimonials.map(t => t.id === editingTestimonial.id ? { ...t, ...saved } : t));
+        showNotification('Testimonial updated!');
+      } else {
+        onUpdateTestimonials([...testimonials, saved]);
+        showNotification('New testimonial added!');
+      }
+      setTestimonialModalOpen(false);
+      setEditingTestimonial(null);
+      setTestimonialPhotoFile(null);
+    } catch (err) {
+      showError(err?.message || 'An unexpected error occurred while saving the testimonial.');
+    } finally {
+      setSavingEntity(null);
     }
-    setTestimonialModalOpen(false);
-    setEditingTestimonial(null);
-    setTestimonialPhotoFile(null);
   };
 
   const handleDeleteTestimonial = async (id) => {
@@ -465,12 +587,24 @@ export const AdminDashboard = ({
   const handleSaveStudentEdit = async (e) => {
     e.preventDefault();
     if (!editingStudent) return;
-    const res = await ApiService.updateStudent(editingStudent.id, editingStudent);
-    const saved = res.student || editingStudent;
-    const updated = students.map(s => s.id === editingStudent.id ? saved : s);
-    onUpdateStudents(updated);
-    showNotification('Student profile updated!');
-    setEditingStudent(null);
+    setSavingEntity('student');
+    setFormError(null);
+    try {
+      const res = await ApiService.updateStudent(editingStudent.id, editingStudent);
+      if (res.success === false) {
+        showError(res.message || 'Failed to update the student profile.');
+        return;
+      }
+      const saved = res.student || editingStudent;
+      const updated = students.map(s => s.id === editingStudent.id ? saved : s);
+      onUpdateStudents(updated);
+      showNotification('Student profile updated!');
+      setEditingStudent(null);
+    } catch (err) {
+      showError(err?.message || 'An unexpected error occurred while updating the student.');
+    } finally {
+      setSavingEntity(null);
+    }
   };
 
   // Stats Computations
@@ -588,6 +722,14 @@ export const AdminDashboard = ({
         <div className="fixed bottom-6 right-6 z-[100] p-4 rounded-2xl bg-emerald-600 text-white font-bold text-sm shadow-2xl flex items-center gap-3 animate-in slide-in-from-bottom duration-200">
           <CheckCircle2 className="w-5 h-5" />
           <span>{notification}</span>
+        </div>
+      )}
+
+      {/* ── Error Toast ── */}
+      {formError && (
+        <div className="fixed bottom-24 right-6 z-[100] p-4 rounded-2xl bg-rose-600 text-white font-bold text-sm shadow-2xl flex items-center gap-3 animate-in slide-in-from-bottom duration-200 max-w-sm">
+          <XCircle className="w-5 h-5 shrink-0" />
+          <span>{formError}</span>
         </div>
       )}
 
@@ -1536,6 +1678,7 @@ export const AdminDashboard = ({
       {editingStudent && (
         <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
           <form onSubmit={handleSaveStudentEdit} className="bg-white rounded-3xl max-w-lg w-full border border-slate-200 shadow-2xl p-6 sm:p-8 space-y-4 animate-in zoom-in-95 text-slate-900">
+            <SaveErrorBanner message={formError} />
             <div className="flex items-center justify-between pb-3 border-b border-slate-200">
               <h3 className="text-xl font-extrabold text-slate-900">Edit Student Details</h3>
               <button type="button" onClick={() => setEditingStudent(null)} className="text-slate-400 hover:text-slate-900">
@@ -1645,12 +1788,9 @@ export const AdminDashboard = ({
               >
                 Cancel
               </button>
-              <button
-                type="submit"
-                className="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-md shadow-blue-600/20"
-              >
+              <SubmitButton saving={savingEntity === 'student'}>
                 Save Changes
-              </button>
+              </SubmitButton>
             </div>
           </form>
         </div>
@@ -1660,6 +1800,7 @@ export const AdminDashboard = ({
       {postModalOpen && editingPost && (
         <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
           <form onSubmit={handleSavePost} className="bg-white rounded-3xl max-w-xl w-full border border-slate-200 shadow-2xl p-6 sm:p-8 space-y-4 animate-in zoom-in-95 text-slate-900">
+            <SaveErrorBanner message={formError} />
             <div className="flex items-center justify-between pb-3 border-b border-slate-200">
               <h3 className="text-xl font-extrabold text-slate-900">
                 {editingPost.id ? 'Edit News Article' : 'Create New Article'}
@@ -1753,12 +1894,9 @@ export const AdminDashboard = ({
               >
                 Cancel
               </button>
-              <button
-                type="submit"
-                className="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold cursor-pointer shadow-md shadow-blue-600/20"
-              >
+              <SubmitButton saving={savingEntity === 'post'}>
                 Save & Publish
-              </button>
+              </SubmitButton>
             </div>
           </form>
         </div>
@@ -1768,6 +1906,7 @@ export const AdminDashboard = ({
       {campaignModalOpen && editingCampaign && (
         <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
           <form onSubmit={handleSaveCampaign} className="bg-white rounded-3xl max-w-xl w-full border border-slate-200 shadow-2xl p-6 sm:p-8 space-y-4 animate-in zoom-in-95 text-slate-900">
+            <SaveErrorBanner message={formError} />
             <div className="flex items-center justify-between pb-3 border-b border-slate-200">
               <h3 className="text-xl font-extrabold text-slate-900">
                 {editingCampaign.id ? 'Edit Campaign' : 'Create Training Campaign'}
@@ -1916,12 +2055,9 @@ export const AdminDashboard = ({
               >
                 Cancel
               </button>
-              <button
-                type="submit"
-                className="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold cursor-pointer shadow-md shadow-blue-600/20"
-              >
+              <SubmitButton saving={savingEntity === 'campaign'}>
                 Save Campaign
-              </button>
+              </SubmitButton>
             </div>
           </form>
         </div>
@@ -1931,6 +2067,7 @@ export const AdminDashboard = ({
       {voletModalOpen && editingVolet && (
         <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
           <form onSubmit={handleSaveVolet} className="bg-white rounded-3xl max-w-lg w-full border border-slate-200 shadow-2xl p-6 sm:p-8 space-y-4 animate-in zoom-in-95 text-slate-900">
+            <SaveErrorBanner message={formError} />
             <div className="flex items-center justify-between pb-3 border-b border-slate-200">
               <h3 className="text-xl font-extrabold text-slate-900">
                 {editingVolet.id ? 'Edit Volet' : 'Create New Volet'}
@@ -2044,12 +2181,9 @@ export const AdminDashboard = ({
               >
                 Cancel
               </button>
-              <button
-                type="submit"
-                className="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold cursor-pointer shadow-md shadow-blue-600/20"
-              >
+              <SubmitButton saving={savingEntity === 'volet'}>
                 Save Volet
-              </button>
+              </SubmitButton>
             </div>
           </form>
         </div>
@@ -2059,6 +2193,7 @@ export const AdminDashboard = ({
       {activityModalOpen && editingActivity && (
         <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
           <form onSubmit={handleSaveActivity} className="bg-white rounded-3xl max-w-lg w-full border border-slate-200 shadow-2xl p-6 sm:p-8 space-y-4 animate-in zoom-in-95 text-slate-900">
+            <SaveErrorBanner message={formError} />
             <div className="flex items-center justify-between pb-3 border-b border-slate-200">
               <h3 className="text-xl font-extrabold text-slate-900">
                 {editingActivity.id ? 'Edit Activity / Trade' : 'Add Activity / Trade'}
@@ -2114,12 +2249,9 @@ export const AdminDashboard = ({
               >
                 Cancel
               </button>
-              <button
-                type="submit"
-                className="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold cursor-pointer shadow-md shadow-blue-600/20"
-              >
+              <SubmitButton saving={savingEntity === 'activity'}>
                 Save Activity
-              </button>
+              </SubmitButton>
             </div>
           </form>
         </div>
@@ -2129,6 +2261,7 @@ export const AdminDashboard = ({
       {partnerModalOpen && editingPartner && (
         <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
           <form onSubmit={handleSavePartner} className="bg-white rounded-3xl max-w-lg w-full border border-slate-200 shadow-2xl p-6 sm:p-8 space-y-4 animate-in zoom-in-95 text-slate-900">
+            <SaveErrorBanner message={formError} />
             <div className="flex items-center justify-between pb-3 border-b border-slate-200">
               <h3 className="text-xl font-extrabold text-slate-900">
                 {editingPartner.id ? 'Edit Partner' : 'Add Partner'}
@@ -2217,12 +2350,9 @@ export const AdminDashboard = ({
               >
                 Cancel
               </button>
-              <button
-                type="submit"
-                className="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold cursor-pointer shadow-md shadow-blue-600/20"
-              >
+              <SubmitButton saving={savingEntity === 'partner'}>
                 Save Partner
-              </button>
+              </SubmitButton>
             </div>
           </form>
         </div>
@@ -2232,6 +2362,7 @@ export const AdminDashboard = ({
       {memberModalOpen && editingMember && (
         <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
           <form onSubmit={handleSaveMember} className="bg-white rounded-3xl max-w-lg w-full border border-slate-200 shadow-2xl p-6 sm:p-8 space-y-4 animate-in zoom-in-95 text-slate-900">
+            <SaveErrorBanner message={formError} />
             <div className="flex items-center justify-between pb-3 border-b border-slate-200">
               <h3 className="text-xl font-extrabold text-slate-900">
                 {editingMember.id ? 'Edit Staff Member' : 'Add Team Member'}
@@ -2314,12 +2445,9 @@ export const AdminDashboard = ({
               >
                 Cancel
               </button>
-              <button
-                type="submit"
-                className="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold cursor-pointer shadow-md shadow-blue-600/20"
-              >
+              <SubmitButton saving={savingEntity === 'member'}>
                 Save Member
-              </button>
+              </SubmitButton>
             </div>
           </form>
         </div>
@@ -2329,6 +2457,7 @@ export const AdminDashboard = ({
       {testimonialModalOpen && editingTestimonial && (
         <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
           <form onSubmit={handleSaveTestimonial} className="bg-white rounded-3xl max-w-lg w-full border border-slate-200 shadow-2xl p-6 sm:p-8 space-y-4 animate-in zoom-in-95 text-slate-900">
+            <SaveErrorBanner message={formError} />
             <div className="flex items-center justify-between pb-3 border-b border-slate-200">
               <h3 className="text-xl font-extrabold text-slate-900">
                 {editingTestimonial.id ? 'Edit Testimonial' : 'Add Testimonial'}
@@ -2436,12 +2565,9 @@ export const AdminDashboard = ({
               >
                 Cancel
               </button>
-              <button
-                type="submit"
-                className="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold cursor-pointer shadow-md shadow-blue-600/20"
-              >
+              <SubmitButton saving={savingEntity === 'testimonial'}>
                 Save Testimonial
-              </button>
+              </SubmitButton>
             </div>
           </form>
         </div>

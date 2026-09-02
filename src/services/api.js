@@ -850,10 +850,11 @@ export const ApiService = {
       if (response.ok && json.data) {
         return { success: true, student: json.data };
       }
-    } catch {
-      // Fallback
+      if (json.message) return { success: false, message: json.message };
+      return { success: false, message: 'Failed to update the student profile.' };
+    } catch (err) {
+      return { success: false, message: err?.message || 'Network error while updating the student profile.' };
     }
-    return { success: true, student: { id, ...studentData } };
   },
 
   async deleteStudent(id) {

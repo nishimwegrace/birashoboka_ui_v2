@@ -72,7 +72,7 @@ export const ProgramsPage = ({
                   <div>
                     <div className="flex items-center justify-between gap-2 mb-4">
                       <span className="px-3 py-1 rounded-full text-xs font-extrabold uppercase tracking-wider bg-blue-600 text-white">
-                        Volet: {volet.name}
+                        {volet.name}
                       </span>
                       <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-100 text-slate-700">
                         {volet.target === 'women' ? 'Women & Girls' : 'Open to All'}
@@ -129,7 +129,7 @@ export const ProgramsPage = ({
                       onClick={() => navigate(`/contact?volet=${volet.id}`)}
                       className="text-xs font-bold text-slate-600 hover:text-blue-600 transition"
                     >
-                      Inquire / Enroll &rarr;
+                      Inquire &rarr;
                     </button>
                   </div>
                   </div>

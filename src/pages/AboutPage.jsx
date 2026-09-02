@@ -86,7 +86,7 @@ export const AboutPage = ({ members, partners, navigate }) => {
               </li>
               <li className="flex items-start gap-2.5">
                 <CheckCircle2 className="w-5 h-5 text-blue-600 shrink-0 mt-0.5" />
-                <span><strong>The Chris Lyricure Center:</strong> Open technical vocational institute in Maramvya & Bujumbura specializing in modern tailoring, computer literacy, and beauty salon entrepreneurship.</span>
+                <span><strong>The Chris Lyricure Center:</strong> Open technical vocational institute in Maramvya & Bujumbura specializing in modern tailoring, computer literacy,culinary arts and beauty salon entrepreneurship.</span>
               </li>
             </ul>
           </div>
