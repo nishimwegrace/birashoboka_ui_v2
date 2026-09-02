@@ -92,8 +92,8 @@ export const NewsPage = ({
               }`}
             >
               <img
-                src={post.featured_image || 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=1400&q=80'}
-                alt={post.title}
+                src={post.featured_image}
+                alt={post.title || 'News'}
                 className="w-full h-full object-cover"
               />
               <div className="absolute inset-0 bg-gradient-to-r from-slate-950/90 via-slate-950/65 to-slate-950/30" />
@@ -240,6 +240,20 @@ export const NewsPage = ({
             );
           })}
         </div>
+
+        {visiblePosts.length === 0 && (
+          <div className="text-center py-20 px-6 bg-white rounded-3xl border border-slate-200 shadow-xs">
+            <div className="mx-auto w-14 h-14 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mb-4">
+              <Search className="w-6 h-6" />
+            </div>
+            <h3 className="text-lg font-bold text-slate-900">No news articles found</h3>
+            <p className="text-sm text-slate-500 mt-1">
+              {posts.length === 0
+                ? 'There are no articles to display yet. Check back soon.'
+                : 'No articles match your current search or filter.'}
+            </p>
+          </div>
+        )}
 
         {/* Infinite Scroll Trigger / Loading Indicator */}
         <div ref={loaderRef} className="py-8 text-center">

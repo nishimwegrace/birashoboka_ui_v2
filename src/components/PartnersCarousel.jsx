@@ -58,36 +58,48 @@ export const PartnersCarousel = ({ partners, navigate }) => {
 
         {/* Continuous Auto-Scroll Track + Manual Scroll Area */}
         {/* Rule requirement: No cards, fixed height with relative width to make logos fully visible */}
-        <div 
-          ref={scrollContainerRef}
-          className="overflow-x-auto no-scrollbar py-4 -mx-4 px-4 scroll-smooth"
-        >
-          <div className="flex items-center gap-10 sm:gap-14 animate-marquee min-w-full">
-            {/* Duplicated list for seamless infinite loop */}
-            {[...partners, ...partners, ...partners].map((partner, index) => (
-              <div
-                key={`${partner.id}-${index}`}
-                onClick={() => navigate('/partners')}
-                className="shrink-0 flex items-center justify-center transition-all duration-300 cursor-pointer group"
-              >
-                {partner.logo ? (
-                  <div className="flex items-center justify-center p-2 rounded-xl hover:bg-slate-50 transition">
-                    <img
-                      src={partner.logo}
-                      alt={partner.name}
-                      loading="lazy"
-                      className="h-16 md:h-20 w-auto object-contain max-w-[200px] transition-transform duration-300 group-hover:scale-105"
-                    />
-                  </div>
-                ) : (
-                  <div className="h-16 md:h-20 px-6 py-2 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-center text-sm font-bold text-slate-700 hover:text-blue-600 transition shadow-2xs whitespace-nowrap">
-                    {partner.name}
-                  </div>
-                )}
-              </div>
-            ))}
+        {partners.length > 0 ? (
+          <div 
+            ref={scrollContainerRef}
+            className="overflow-x-auto no-scrollbar py-4 -mx-4 px-4 scroll-smooth"
+          >
+            <div className="flex items-center gap-10 sm:gap-14 animate-marquee min-w-full">
+              {/* Duplicated list for seamless infinite loop */}
+              {[...partners, ...partners, ...partners].map((partner, index) => (
+                <div
+                  key={`${partner.id}-${index}`}
+                  onClick={() => navigate('/partners')}
+                  className="shrink-0 flex items-center justify-center transition-all duration-300 cursor-pointer group"
+                >
+                  {partner.logo ? (
+                    <div className="flex items-center justify-center p-2 rounded-xl hover:bg-slate-50 transition">
+                      <img
+                        src={partner.logo}
+                        alt={partner.name}
+                        loading="lazy"
+                        className="h-16 md:h-20 w-auto object-contain max-w-[200px] transition-transform duration-300 group-hover:scale-105"
+                      />
+                    </div>
+                  ) : (
+                    <div className="h-16 md:h-20 px-6 py-2 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-center text-sm font-bold text-slate-700 hover:text-blue-600 transition shadow-2xs whitespace-nowrap">
+                      {partner.name}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
+        ) : (
+          <div className="text-center py-14 bg-slate-50 rounded-2xl border border-slate-200">
+            <div className="mx-auto w-14 h-14 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mb-4">
+              <Handshake className="w-6 h-6" />
+            </div>
+            <h3 className="text-lg font-bold text-slate-900">No partners listed yet</h3>
+            <p className="text-sm text-slate-500 mt-1">
+              Our supporting partners will be showcased here.
+            </p>
+          </div>
+        )}
 
         {/* Bottom invitation */}
         <div className="mt-8 pt-6 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">

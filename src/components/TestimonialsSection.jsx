@@ -17,56 +17,68 @@ export const TestimonialsSection = ({ testimonials, navigate }) => {
         </div>
 
         {/* Testimonials Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {testimonials.map((testi, index) => (
-            <div
-              key={testi.id || index}
-              className="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-xs hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between"
-            >
-              <div>
-                {/* Top Quote Icon & Stars */}
-                <div className="flex items-center justify-between mb-4">
-                  <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
-                    <Quote className="w-4 h-4" />
+        {testimonials.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {testimonials.map((testi, index) => (
+              <div
+                key={testi.id || index}
+                className="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-xs hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between"
+              >
+                <div>
+                  {/* Top Quote Icon & Stars */}
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
+                      <Quote className="w-4 h-4" />
+                    </div>
+                    <div className="flex items-center gap-1 text-amber-400">
+                      {[...Array(testi.rating || 5)].map((_, i) => (
+                        <Star key={i} className="w-3.5 h-3.5 fill-current" />
+                      ))}
+                    </div>
                   </div>
-                  <div className="flex items-center gap-1 text-amber-400">
-                    {[...Array(testi.rating || 5)].map((_, i) => (
-                      <Star key={i} className="w-3.5 h-3.5 fill-current" />
-                    ))}
-                  </div>
+
+                  {/* Quote Content from {Testimonial.content} */}
+                  <p className="text-sm text-slate-700 italic leading-relaxed line-clamp-5">
+                    "{testi.content}"
+                  </p>
                 </div>
 
-                {/* Quote Content from {Testimonial.content} */}
-                <p className="text-sm text-slate-700 italic leading-relaxed line-clamp-5">
-                  "{testi.content}"
-                </p>
-              </div>
-
-              {/* Author Details */}
-              <div className="mt-6 pt-4 border-t border-slate-100 flex items-center gap-3">
-                {testi.photo ? (
-                  <img
-                    src={testi.photo}
-                    alt={testi.name}
-                    className="w-11 h-11 rounded-full object-cover border-2 border-blue-100 shrink-0"
-                  />
-                ) : (
-                  <div className="w-11 h-11 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-600 text-white font-bold text-sm flex items-center justify-center shrink-0">
-                    {testi.name.slice(0, 2).toUpperCase()}
-                  </div>
-                )}
-                <div className="min-w-0">
-                  <div className="text-sm font-bold text-slate-900 truncate">
-                    {testi.name}
-                  </div>
-                  <div className="text-xs text-blue-600 font-medium truncate">
-                    {testi.role || 'Program Alumnus'}
+                {/* Author Details */}
+                <div className="mt-6 pt-4 border-t border-slate-100 flex items-center gap-3">
+                  {testi.photo ? (
+                    <img
+                      src={testi.photo}
+                      alt={testi.name}
+                      className="w-11 h-11 rounded-full object-cover border-2 border-blue-100 shrink-0"
+                    />
+                  ) : (
+                    <div className="w-11 h-11 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-600 text-white font-bold text-sm flex items-center justify-center shrink-0">
+                      {testi.name.slice(0, 2).toUpperCase()}
+                    </div>
+                  )}
+                  <div className="min-w-0">
+                    <div className="text-sm font-bold text-slate-900 truncate">
+                      {testi.name}
+                    </div>
+                    <div className="text-xs text-blue-600 font-medium truncate">
+                      {testi.role || 'Program Alumnus'}
+                    </div>
                   </div>
                 </div>
               </div>
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-16 bg-white rounded-3xl border border-slate-200 shadow-xs">
+            <div className="mx-auto w-14 h-14 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mb-4">
+              <Quote className="w-6 h-6" />
             </div>
-          ))}
-        </div>
+            <h3 className="text-lg font-bold text-slate-900">No testimonials yet</h3>
+            <p className="text-sm text-slate-500 mt-1">
+              Testimonials from our graduates will appear here once available.
+            </p>
+          </div>
+        )}
 
         {/* Impact Guarantee Banner */}
         <div className="mt-12 p-6 rounded-2xl bg-blue-900 text-white flex flex-col sm:flex-row items-center justify-between gap-4 shadow-lg">

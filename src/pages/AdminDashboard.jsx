@@ -502,11 +502,17 @@ export const AdminDashboard = ({
       {/* User card */}
       <div className="px-4 py-4 border-b border-slate-100">
         <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 border border-slate-200">
-          <img
-            src={currentUser?.avatar || 'https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=400&q=80'}
-            alt="User"
-            className="w-9 h-9 rounded-full object-cover border border-slate-300 flex-shrink-0"
-          />
+          {currentUser?.avatar ? (
+            <img
+              src={currentUser.avatar}
+              alt="User"
+              className="w-9 h-9 rounded-full object-cover border border-slate-300 flex-shrink-0"
+            />
+          ) : (
+            <div className="w-9 h-9 rounded-full object-cover border border-slate-300 flex-shrink-0 bg-blue-600 text-white flex items-center justify-center text-xs font-bold">
+              {(currentUser?.name || 'A').charAt(0).toUpperCase()}
+            </div>
+          )}
           <div className="min-w-0">
             <div className="text-xs font-bold text-slate-900 truncate">{currentUser?.name || 'Administrator'}</div>
             <div className="text-[10px] text-emerald-600 font-semibold flex items-center gap-1">

@@ -183,11 +183,17 @@ export const AboutPage = ({ members, partners, navigate }) => {
               >
                 {/* Circular photo as explicitly requested */}
                 <div className="relative w-28 h-28 sm:w-36 sm:h-36 rounded-full overflow-hidden border-4 border-white shadow-lg bg-slate-100 group-hover:scale-105 group-hover:border-blue-500 transition-all duration-300">
-                  <img
-                    src={member.avatar}
-                    alt={member.name}
-                    className="w-full h-full object-cover"
-                  />
+                  {member.avatar ? (
+                    <img
+                      src={member.avatar}
+                      alt={member.name}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-tr from-blue-600 to-indigo-600 text-white text-3xl font-bold">
+                      {(member.name || '?').charAt(0).toUpperCase()}
+                    </div>
+                  )}
                 </div>
                 <h4 className="text-base font-bold text-slate-900 mt-4 leading-snug">
                   {member.name}
@@ -211,6 +217,17 @@ export const AboutPage = ({ members, partners, navigate }) => {
               </div>
             ))}
           </div>
+          {members.length === 0 && (
+            <div className="text-center py-14 bg-slate-50 rounded-3xl border border-slate-200">
+              <div className="mx-auto w-14 h-14 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mb-4">
+                <Users className="w-6 h-6" />
+              </div>
+              <h3 className="text-lg font-bold text-slate-900">No team members listed yet</h3>
+              <p className="text-sm text-slate-500 mt-1">
+                Our leadership and staff profiles will appear here.
+              </p>
+            </div>
+          )}
         </section>
 
         {/* 5. Core Values */}

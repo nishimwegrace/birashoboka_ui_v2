@@ -11,7 +11,8 @@ import {
   ArrowRight,
   Heart,
   Eye,
-  Tag
+  Tag,
+  FileText
 } from 'lucide-react';
 
 export const PostDetailPage = ({
@@ -219,11 +220,17 @@ export const PostDetailPage = ({
                     >
                       {/* Image */}
                       <div className="w-16 h-16 rounded-xl overflow-hidden bg-slate-100 shrink-0 border border-slate-200">
-                        <img
-                          src={rel.featured_image || 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=400&q=80'}
-                          alt={rel.title}
-                          className="w-full h-full object-cover group-hover:scale-110 transition duration-300"
-                        />
+                        {rel.featured_image ? (
+                          <img
+                            src={rel.featured_image}
+                            alt={rel.title}
+                            className="w-full h-full object-cover group-hover:scale-110 transition duration-300"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-50 to-slate-100 text-blue-600">
+                            <FileText className="w-5 h-5" />
+                          </div>
+                        )}
                       </div>
 
                       {/* Content */}

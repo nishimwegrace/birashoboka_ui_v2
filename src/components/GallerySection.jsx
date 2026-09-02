@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowRight, ExternalLink } from 'lucide-react';
+import { ArrowRight, ExternalLink, Image as ImageIcon } from 'lucide-react';
 
 export const GallerySection = ({ 
   posts, 
@@ -54,36 +54,48 @@ export const GallerySection = ({
         )}
 
         {/* Gallery Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {displayItems.map((item, idx) => (
-            <div
-              key={`${item.post.id}-${idx}`}
-              onClick={() => navigate(`/news/${item.post.id}`)}
-              className="group relative aspect-square rounded-2xl overflow-hidden bg-slate-100 shadow-xs border border-slate-200/80 cursor-pointer"
-            >
-              <img
-                src={item.imageUrl}
-                alt={item.post.title}
-                loading="lazy"
-                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-              />
-              
-              {/* Hover overlay with post title and link */}
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 p-4 flex flex-col justify-end text-white">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-blue-300 mb-1">
-                  {item.post.volet?.name || 'Birashoboka'}
-                </span>
-                <p className="text-xs font-bold line-clamp-2 leading-snug">
-                  {item.post.title}
-                </p>
-                <div className="mt-2 flex items-center gap-1 text-[11px] text-slate-300 font-medium">
-                  <span>View Story</span>
-                  <ArrowRight className="w-3 h-3 text-blue-400 group-hover:translate-x-0.5 transition-transform" />
+        {displayItems.length > 0 ? (
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {displayItems.map((item, idx) => (
+              <div
+                key={`${item.post.id}-${idx}`}
+                onClick={() => navigate(`/news/${item.post.id}`)}
+                className="group relative aspect-square rounded-2xl overflow-hidden bg-slate-100 shadow-xs border border-slate-200/80 cursor-pointer"
+              >
+                <img
+                  src={item.imageUrl}
+                  alt={item.post.title}
+                  loading="lazy"
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                />
+                
+                {/* Hover overlay with post title and link */}
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 p-4 flex flex-col justify-end text-white">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-blue-300 mb-1">
+                    {item.post.volet?.name || 'Birashoboka'}
+                  </span>
+                  <p className="text-xs font-bold line-clamp-2 leading-snug">
+                    {item.post.title}
+                  </p>
+                  <div className="mt-2 flex items-center gap-1 text-[11px] text-slate-300 font-medium">
+                    <span>View Story</span>
+                    <ArrowRight className="w-3 h-3 text-blue-400 group-hover:translate-x-0.5 transition-transform" />
+                  </div>
                 </div>
               </div>
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-16 bg-slate-50 rounded-3xl border border-slate-200">
+            <div className="mx-auto w-14 h-14 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mb-4">
+              <ImageIcon className="w-6 h-6" />
             </div>
-          ))}
-        </div>
+            <h3 className="text-lg font-bold text-slate-900">No gallery photos yet</h3>
+            <p className="text-sm text-slate-500 mt-1">
+              Photos from our training, outreach, and events will appear here.
+            </p>
+          </div>
+        )}
 
         {/* Read More button on Home */}
         {!isFullPage && (

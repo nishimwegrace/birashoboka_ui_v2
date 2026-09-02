@@ -16,9 +16,6 @@ import { PartnersPage } from './pages/PartnersPage.jsx';
 import { ContactPage } from './pages/ContactPage.jsx';
 import { ApplyPage } from './pages/ApplyPage.jsx';
 import { ApiService, getStoredUser, setStoredUser } from './services/api.js';
-import { SEED_VOLETS, SEED_ACTIVITIES, SEED_POSTS, SEED_PARTNERS, SEED_TESTIMONIALS, 
-  SEED_CAMPAIGNS, SEED_MEMBERS, SEED_STUDENTS, SEED_INSCRIPTIONS 
-} from './data/seedData.js';
 
 // Lazy load heavy admin components for website performance
 const AdminDashboard = lazy(() => import('./pages/AdminDashboard.jsx').then(m => ({ default: m.AdminDashboard })));
@@ -32,15 +29,15 @@ function AppContent() {
   const searchParams = location.search ? location.search.replace(/^\?/, '') : '';
 
   // Data States
-  const [volets, setVolets] = useState(SEED_VOLETS);
-  const [activities, setActivities] = useState(SEED_ACTIVITIES);
-  const [posts, setPosts] = useState(SEED_POSTS);
-  const [partners, setPartners] = useState(SEED_PARTNERS);
-  const [testimonials, setTestimonials] = useState(SEED_TESTIMONIALS);
-  const [campaigns, setCampaigns] = useState(SEED_CAMPAIGNS);
-  const [members, setMembers] = useState(SEED_MEMBERS);
-  const [students, setStudents] = useState(SEED_STUDENTS);
-  const [inscriptions, setInscriptions] = useState(SEED_INSCRIPTIONS);
+  const [volets, setVolets] = useState([]);
+  const [activities, setActivities] = useState([]);
+  const [posts, setPosts] = useState([]);
+  const [partners, setPartners] = useState([]);
+  const [testimonials, setTestimonials] = useState([]);
+  const [campaigns, setCampaigns] = useState([]);
+  const [members, setMembers] = useState([]);
+  const [students, setStudents] = useState([]);
+  const [inscriptions, setInscriptions] = useState([]);
   
   // Auth state (Restores authenticated session from localStorage on reload)
   const [currentUser, setCurrentUser] = useState(() => getStoredUser());
@@ -78,7 +75,7 @@ function AppContent() {
     return () => clearTimeout(timer);
   }, [location.pathname]);
 
-  // Fetch initial data from PHP API (or fallback to seed)
+  // Fetch initial data from PHP API
   const loadAllData = async () => {
     setIsLoading(true);
     try {
@@ -104,19 +101,19 @@ function AppContent() {
         ApiService.getInscriptions()
       ]);
 
-      if (voletsRes.items && voletsRes.items.length > 0) setVolets(voletsRes.items);
-      if (activitiesRes.items && activitiesRes.items.length > 0) setActivities(activitiesRes.items);
-      if (postsRes.items && postsRes.items.length > 0) setPosts(postsRes.items);
-      if (partnersRes.items && partnersRes.items.length > 0) setPartners(partnersRes.items);
-      if (testimonialsRes.items && testimonialsRes.items.length > 0) setTestimonials(testimonialsRes.items);
-      if (campaignsRes.items && campaignsRes.items.length > 0) setCampaigns(campaignsRes.items);
-      if (membersRes.items && membersRes.items.length > 0) setMembers(membersRes.items);
-      if (studentsRes.items && studentsRes.items.length > 0) setStudents(studentsRes.items);
-      if (inscriptionsRes.items && inscriptionsRes.items.length > 0) setInscriptions(inscriptionsRes.items);
+      setVolets(voletsRes.items || []);
+      setActivities(activitiesRes.items || []);
+      setPosts(postsRes.items || []);
+      setPartners(partnersRes.items || []);
+      setTestimonials(testimonialsRes.items || []);
+      setCampaigns(campaignsRes.items || []);
+      setMembers(membersRes.items || []);
+      setStudents(studentsRes.items || []);
+      setInscriptions(inscriptionsRes.items || []);
 
       setIsApiLive(voletsRes.isLive || postsRes.isLive || partnersRes.isLive);
     } catch (err) {
-      console.warn('Using offline / seed data fallback:', err);
+      console.warn('Failed to load data from API:', err);
     } finally {
       setIsLoading(false);
     }

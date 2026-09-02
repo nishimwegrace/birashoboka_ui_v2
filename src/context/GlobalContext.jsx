@@ -1,29 +1,18 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { ApiService } from '../services/api';
-import {
-  SEED_VOLETS,
-  SEED_ACTIVITIES,
-  SEED_POSTS,
-  SEED_PARTNERS,
-  SEED_TESTIMONIALS,
-  SEED_CAMPAIGNS,
-  SEED_MEMBERS,
-  SEED_STUDENTS,
-  SEED_INSCRIPTIONS
-} from '../data/seedData';
 
 const GlobalContext = createContext(null);
 
 export const GlobalProvider = ({ children }) => {
-  const [volets, setVolets] = useState(SEED_VOLETS);
-  const [activities, setActivities] = useState(SEED_ACTIVITIES);
-  const [posts, setPosts] = useState(SEED_POSTS);
-  const [partners, setPartners] = useState(SEED_PARTNERS);
-  const [testimonials, setTestimonials] = useState(SEED_TESTIMONIALS);
-  const [campaigns, setCampaigns] = useState(SEED_CAMPAIGNS);
-  const [members, setMembers] = useState(SEED_MEMBERS);
-  const [students, setStudents] = useState(SEED_STUDENTS);
-  const [inscriptions, setInscriptions] = useState(SEED_INSCRIPTIONS);
+  const [volets, setVolets] = useState([]);
+  const [activities, setActivities] = useState([]);
+  const [posts, setPosts] = useState([]);
+  const [partners, setPartners] = useState([]);
+  const [testimonials, setTestimonials] = useState([]);
+  const [campaigns, setCampaigns] = useState([]);
+  const [members, setMembers] = useState([]);
+  const [students, setStudents] = useState([]);
+  const [inscriptions, setInscriptions] = useState([]);
 
   const [loading, setLoading] = useState(false);
   const [apiError, setApiError] = useState(null);
@@ -56,32 +45,15 @@ export const GlobalProvider = ({ children }) => {
         ApiService.getInscriptions()
       ]);
 
-      if (voletsRes.isLive && Array.isArray(voletsRes.items)) setVolets(voletsRes.items);
-      else if (voletsRes.items?.length) setVolets(voletsRes.items);
-
-      if (activitiesRes.isLive && Array.isArray(activitiesRes.items)) setActivities(activitiesRes.items);
-      else if (activitiesRes.items?.length) setActivities(activitiesRes.items);
-
-      if (postsRes.isLive && Array.isArray(postsRes.items)) setPosts(postsRes.items);
-      else if (postsRes.items?.length) setPosts(postsRes.items);
-
-      if (partnersRes.isLive && Array.isArray(partnersRes.items)) setPartners(partnersRes.items);
-      else if (partnersRes.items?.length) setPartners(partnersRes.items);
-
-      if (testimonialsRes.isLive && Array.isArray(testimonialsRes.items)) setTestimonials(testimonialsRes.items);
-      else if (testimonialsRes.items?.length) setTestimonials(testimonialsRes.items);
-
-      if (campaignsRes.isLive && Array.isArray(campaignsRes.items)) setCampaigns(campaignsRes.items);
-      else if (campaignsRes.items?.length) setCampaigns(campaignsRes.items);
-
-      if (membersRes.isLive && Array.isArray(membersRes.items)) setMembers(membersRes.items);
-      else if (membersRes.items?.length) setMembers(membersRes.items);
-
-      if (studentsRes.isLive && Array.isArray(studentsRes.items)) setStudents(studentsRes.items);
-      else if (studentsRes.items?.length) setStudents(studentsRes.items);
-
-      if (inscriptionsRes.isLive && Array.isArray(inscriptionsRes.items)) setInscriptions(inscriptionsRes.items);
-      else if (inscriptionsRes.items?.length) setInscriptions(inscriptionsRes.items);
+      setVolets(voletsRes.items || []);
+      setActivities(activitiesRes.items || []);
+      setPosts(postsRes.items || []);
+      setPartners(partnersRes.items || []);
+      setTestimonials(testimonialsRes.items || []);
+      setCampaigns(campaignsRes.items || []);
+      setMembers(membersRes.items || []);
+      setStudents(studentsRes.items || []);
+      setInscriptions(inscriptionsRes.items || []);
 
       setIsLiveConnected(
         voletsRes.isLive ||

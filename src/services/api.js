@@ -1,15 +1,3 @@
-import {
-  SEED_VOLETS,
-  SEED_ACTIVITIES,
-  SEED_POSTS,
-  SEED_PARTNERS,
-  SEED_TESTIMONIALS,
-  SEED_CAMPAIGNS,
-  SEED_MEMBERS,
-  SEED_STUDENTS,
-  SEED_INSCRIPTIONS
-} from '../data/seedData';
-
 const BASE_URL_STORAGE_KEY = 'birashoboka_api_base_url';
 const AUTH_TOKEN_STORAGE_KEY = 'birashoboka_api_token';
 const AUTH_USER_STORAGE_KEY = 'birashoboka_api_user';
@@ -78,7 +66,7 @@ export function formatImageUrl(url) {
   return cleanBase ? `${cleanBase}/${fullPath}` : `/${fullPath}`;
 }
 
-// Fetch helper with timeout & fallback
+// Fetch helper with timeout. On failure returns empty-data result so pages show empty states.
 async function fetchWithFallback(endpoint, fallbackData, options) {
   const baseUrl = getStoredApiBaseUrl();
   const token = getStoredAuthToken();
@@ -118,7 +106,7 @@ async function fetchWithFallback(endpoint, fallbackData, options) {
     return { data: json, isLive: true };
   } catch (err) {
     const errMsg = err instanceof Error ? err.message : String(err);
-    // Silent fallback to seedData
+    // Return empty fallback so the UI renders empty states instead of mock data.
     return { data: fallbackData, isLive: false, error: errMsg };
   }
 }
@@ -127,47 +115,38 @@ export const ApiService = {
   // Volets
   async getVolets() {
     const res = await fetchWithFallback('api/volets?per_page=50', {
-      items: SEED_VOLETS,
-      pagination: { page: 1, per_page: 50, total: SEED_VOLETS.length, last_page: 1 }
+      items: [],
+      pagination: { page: 1, per_page: 50, total: 0, last_page: 0 }
     });
 
-    const items = Array.isArray(res.data) 
-      ? res.data 
-      : (res.data?.items || SEED_VOLETS);
+    const items = Array.isArray(res.data)
+      ? res.data
+      : (res.data?.items || []);
 
-    // Attach local relations if missing
+    // Attach local relations when not provided by the API
     const enriched = items.map(v => ({
       ...v,
       carousel_images: Array.isArray(v.carousel_images) ? v.carousel_images.map(img => formatImageUrl(img)).filter(Boolean) : [],
-      activities: v.activities || SEED_ACTIVITIES.filter(a => a.volet_id === v.id),
-      posts: v.posts || SEED_POSTS.filter(p => p.volet_id === v.id),
-      partners: v.partners || SEED_PARTNERS.filter(p => p.volet_id === v.id),
-      campaigns: v.campaigns || SEED_CAMPAIGNS.filter(c => c.volet_id === v.id)
+      activities: v.activities || [],
+      posts: v.posts || [],
+      partners: v.partners || [],
+      campaigns: v.campaigns || []
     }));
 
     return { items: enriched, isLive: res.isLive };
   },
 
   async getVolet(id) {
-    const foundLocal = SEED_VOLETS.find(v => String(v.id) === String(id) || v.name.toLowerCase() === String(id).toLowerCase());
-    const res = await fetchWithFallback(`api/volets/${id}`, foundLocal || SEED_VOLETS[0]);
-    
+    const res = await fetchWithFallback(`api/volets/${id}`, null);
+
     if (!res.data) return { data: null, isLive: res.isLive };
 
     const volet = { ...res.data };
     volet.carousel_images = Array.isArray(volet.carousel_images) ? volet.carousel_images.map(img => formatImageUrl(img)).filter(Boolean) : [];
-    if (!volet.activities || volet.activities.length === 0) {
-      volet.activities = SEED_ACTIVITIES.filter(a => a.volet_id === volet.id);
-    }
-    if (!volet.posts || volet.posts.length === 0) {
-      volet.posts = SEED_POSTS.filter(p => p.volet_id === volet.id);
-    }
-    if (!volet.partners || volet.partners.length === 0) {
-      volet.partners = SEED_PARTNERS.filter(p => p.volet_id === volet.id);
-    }
-    if (!volet.campaigns || volet.campaigns.length === 0) {
-      volet.campaigns = SEED_CAMPAIGNS.filter(c => c.volet_id === volet.id);
-    }
+    if (!volet.activities) volet.activities = [];
+    if (!volet.posts) volet.posts = [];
+    if (!volet.partners) volet.partners = [];
+    if (!volet.campaigns) volet.campaigns = [];
 
     return { data: volet, isLive: res.isLive };
   },
@@ -177,33 +156,28 @@ export const ApiService = {
     let url = `api/posts?page=${page}&per_page=${perPage}`;
     if (voletId) url += `&volet_id=${voletId}`;
 
-    let filteredSeed = SEED_POSTS;
-    if (voletId) {
-      filteredSeed = SEED_POSTS.filter(p => p.volet_id === voletId);
-    }
-
     const res = await fetchWithFallback(url, {
-      items: filteredSeed,
+      items: [],
       pagination: {
         page,
         per_page: perPage,
-        total: filteredSeed.length,
-        last_page: Math.ceil(filteredSeed.length / perPage) || 1
+        total: 0,
+        last_page: 0
       }
     });
 
-    const items = Array.isArray(res.data) ? res.data : (res.data?.items || filteredSeed);
+    const items = Array.isArray(res.data) ? res.data : (res.data?.items || []);
     
     // Enrich with volet and default image if missing
-    const enriched = items.map((p, idx) => {
-      const featImg = formatImageUrl(p.featured_image) || SEED_POSTS[idx % SEED_POSTS.length]?.featured_image;
+    const enriched = items.map((p) => {
+      const featImg = formatImageUrl(p.featured_image) || '';
       const rawGallery = p.image_urls && p.image_urls.length > 0 ? p.image_urls : [p.featured_image || ''];
       const gallery = rawGallery.map(img => formatImageUrl(img)).filter(Boolean);
       return {
         ...p,
         featured_image: featImg,
-        image_urls: gallery.length > 0 ? gallery : [featImg],
-        volet: p.volet || SEED_VOLETS.find(v => v.id === p.volet_id)
+        image_urls: gallery.length > 0 ? gallery : [],
+        volet: p.volet || null
       };
     });
 
@@ -211,27 +185,26 @@ export const ApiService = {
       page,
       per_page: perPage,
       total: enriched.length,
-      last_page: Math.ceil(enriched.length / perPage) || 1
+      last_page: Math.ceil(enriched.length / perPage) || 0
     };
 
     return { items: enriched, pagination, isLive: res.isLive };
   },
 
   async getPost(id) {
-    const local = SEED_POSTS.find(p => String(p.id) === String(id));
-    const res = await fetchWithFallback(`api/posts/${id}`, local || SEED_POSTS[0]);
+    const res = await fetchWithFallback(`api/posts/${id}`, null);
     if (!res.data) return { data: null, isLive: res.isLive };
 
     const post = { ...res.data };
-    const featImg = formatImageUrl(post.featured_image) || local?.featured_image || SEED_POSTS[0].featured_image;
+    const featImg = formatImageUrl(post.featured_image) || '';
     const rawGallery = (post.image_urls && post.image_urls.length > 0) 
       ? post.image_urls 
-      : (local?.image_urls || [post.featured_image || '']);
+      : [post.featured_image || ''];
     const gallery = rawGallery.map(img => formatImageUrl(img)).filter(Boolean);
 
     post.featured_image = featImg;
-    post.image_urls = gallery.length > 0 ? gallery : [featImg];
-    post.volet = post.volet || SEED_VOLETS.find(v => v.id === post.volet_id);
+    post.image_urls = gallery;
+    post.volet = post.volet || null;
 
     return { data: post, isLive: res.isLive };
   },
@@ -239,14 +212,14 @@ export const ApiService = {
   // Activities
   async getActivities() {
     const res = await fetchWithFallback('api/activities?per_page=50', {
-      items: SEED_ACTIVITIES,
-      pagination: { page: 1, per_page: 50, total: SEED_ACTIVITIES.length, last_page: 1 }
+      items: [],
+      pagination: { page: 1, per_page: 50, total: 0, last_page: 0 }
     });
 
-    const items = Array.isArray(res.data) ? res.data : (res.data?.items || SEED_ACTIVITIES);
+    const items = Array.isArray(res.data) ? res.data : (res.data?.items || []);
     const enriched = items.map(a => ({
       ...a,
-      volet: a.volet || SEED_VOLETS.find(v => v.id === a.volet_id)
+      volet: a.volet || null
     }));
 
     return { items: enriched, isLive: res.isLive };
@@ -255,16 +228,16 @@ export const ApiService = {
   // Partners
   async getPartners() {
     const res = await fetchWithFallback('api/partners?per_page=50', {
-      items: SEED_PARTNERS,
-      pagination: { page: 1, per_page: 50, total: SEED_PARTNERS.length, last_page: 1 }
+      items: [],
+      pagination: { page: 1, per_page: 50, total: 0, last_page: 0 }
     });
 
-    const items = Array.isArray(res.data) ? res.data : (res.data?.items || SEED_PARTNERS);
-    const enriched = items.map((p, i) => ({
+    const items = Array.isArray(res.data) ? res.data : (res.data?.items || []);
+    const enriched = items.map((p) => ({
       ...p,
-      logo: formatImageUrl(p.logo) || SEED_PARTNERS[i % SEED_PARTNERS.length]?.logo,
-      type: p.type || SEED_PARTNERS[i % SEED_PARTNERS.length]?.type || 'Partner Organization',
-      volet: p.volet || SEED_VOLETS.find(v => v.id === p.volet_id)
+      logo: formatImageUrl(p.logo) || '',
+      type: p.type || 'Partner Organization',
+      volet: p.volet || null
     }));
 
     return { items: enriched, isLive: res.isLive };
@@ -273,15 +246,15 @@ export const ApiService = {
   // Testimonials
   async getTestimonials() {
     const res = await fetchWithFallback('api/testimonials?per_page=50', {
-      items: SEED_TESTIMONIALS,
-      pagination: { page: 1, per_page: 50, total: SEED_TESTIMONIALS.length, last_page: 1 }
+      items: [],
+      pagination: { page: 1, per_page: 50, total: 0, last_page: 0 }
     });
 
-    const items = Array.isArray(res.data) ? res.data : (res.data?.items || SEED_TESTIMONIALS);
-    const enriched = items.map((t, i) => ({
+    const items = Array.isArray(res.data) ? res.data : (res.data?.items || []);
+    const enriched = items.map((t) => ({
       ...t,
-      photo: formatImageUrl(t.photo) || SEED_TESTIMONIALS[i % SEED_TESTIMONIALS.length]?.photo,
-      role: t.role || SEED_TESTIMONIALS[i % SEED_TESTIMONIALS.length]?.role,
+      photo: formatImageUrl(t.photo) || '',
+      role: t.role || '',
       rating: t.rating || 5
     }));
 
@@ -291,15 +264,15 @@ export const ApiService = {
   // Campaigns & Inscriptions
   async getCampaigns() {
     const res = await fetchWithFallback('api/campaigns?per_page=20', {
-      items: SEED_CAMPAIGNS,
-      pagination: { page: 1, per_page: 20, total: SEED_CAMPAIGNS.length, last_page: 1 }
+      items: [],
+      pagination: { page: 1, per_page: 20, total: 0, last_page: 0 }
     });
 
-    const items = Array.isArray(res.data) ? res.data : (res.data?.items || SEED_CAMPAIGNS);
+    const items = Array.isArray(res.data) ? res.data : (res.data?.items || []);
     const enriched = items.map(c => ({
       ...c,
-      volet: c.volet || SEED_VOLETS.find(v => v.id === c.volet_id),
-      activity: c.activity || SEED_ACTIVITIES.find(a => a.id === c.activity_id)
+      volet: c.volet || null,
+      activity: c.activity || null
     }));
 
     return { items: enriched, isLive: res.isLive };
@@ -308,13 +281,13 @@ export const ApiService = {
   // Team members
   async getMembers() {
     const res = await fetchWithFallback('api/members?per_page=50', {
-      items: SEED_MEMBERS,
-      pagination: { page: 1, per_page: 50, total: SEED_MEMBERS.length, last_page: 1 }
+      items: [],
+      pagination: { page: 1, per_page: 50, total: 0, last_page: 0 }
     });
-    const items = Array.isArray(res.data) ? res.data : (res.data?.items || SEED_MEMBERS);
-    const enriched = items.map((m, i) => ({
+    const items = Array.isArray(res.data) ? res.data : (res.data?.items || []);
+    const enriched = items.map((m) => ({
       ...m,
-      avatar: formatImageUrl(m.avatar) || SEED_MEMBERS[i % SEED_MEMBERS.length]?.avatar,
+      avatar: formatImageUrl(m.avatar) || '',
       bio: m.bio || '',
       position: m.position || 'Team Member'
     }));
@@ -324,27 +297,27 @@ export const ApiService = {
   // Students & Inscriptions
   async getStudents() {
     const res = await fetchWithFallback('api/students?per_page=100', {
-      items: SEED_STUDENTS,
-      pagination: { page: 1, per_page: 100, total: SEED_STUDENTS.length, last_page: 1 }
+      items: [],
+      pagination: { page: 1, per_page: 100, total: 0, last_page: 0 }
     });
-    const items = Array.isArray(res.data) ? res.data : (res.data?.items || SEED_STUDENTS);
+    const items = Array.isArray(res.data) ? res.data : (res.data?.items || []);
     return { items, isLive: res.isLive };
   },
 
   async getInscriptions() {
     const res = await fetchWithFallback('api/inscriptions?per_page=100', {
-      items: SEED_INSCRIPTIONS,
-      pagination: { page: 1, per_page: 100, total: SEED_INSCRIPTIONS.length, last_page: 1 }
+      items: [],
+      pagination: { page: 1, per_page: 100, total: 0, last_page: 0 }
     });
-    const items = Array.isArray(res.data) ? res.data : (res.data?.items || SEED_INSCRIPTIONS);
+    const items = Array.isArray(res.data) ? res.data : (res.data?.items || []);
     
     // Enrich with Student & Campaign
     const enriched = items.map(ins => ({
       ...ins,
-      student: ins.student || SEED_STUDENTS.find(s => s.id === ins.student_id),
-      campaign: ins.campaign || SEED_CAMPAIGNS.find(c => c.id === ins.campaign_id),
-      volet: ins.volet || SEED_VOLETS.find(v => v.id === ins.volet_id),
-      activity: ins.activity || SEED_ACTIVITIES.find(a => a.id === ins.activity_id)
+      student: ins.student || null,
+      campaign: ins.campaign || null,
+      volet: ins.volet || null,
+      activity: ins.activity || null
     }));
 
     return { items: enriched, isLive: res.isLive };
@@ -431,45 +404,6 @@ export const ApiService = {
     const cleanBase = baseUrl.replace(/\/+$/, '');
     const url = cleanBase ? `${cleanBase}/api/enroll` : '/api/enroll';
 
-    const newStudentId = Date.now();
-    const newInscriptionId = Date.now() + 1;
-    const refNum = `INS-2026-${Math.floor(1000 + Math.random() * 9000)}`;
-
-    const fallbackStudent = {
-      id: newStudentId,
-      name: payload.student.name || 'New Student',
-      email: payload.student.email || null,
-      phone: payload.student.phone || '+257 79 000 000',
-      gender: payload.student.gender || 'female',
-      age: payload.student.age || 20,
-      birth_date: payload.student.birth_date || null,
-      nationality: payload.student.nationality || 'Burundaise',
-      province: payload.student.province || 'Ngozi',
-      commune: payload.student.commune || 'Ngozi',
-      address: payload.student.address || '',
-      vulnerability_category: payload.student.vulnerability_category || 'General Applicant',
-      education_level: payload.student.education_level || 'Secondary',
-      interest: payload.student.interest || null,
-      created_at: new Date().toISOString()
-    };
-
-    const fallbackInscription = {
-      id: newInscriptionId,
-      reference_number: refNum,
-      campaign_id: payload.inscription.campaign_id || 1,
-      student_id: newStudentId,
-      volet_id: payload.inscription.volet_id || 1,
-      activity_id: payload.inscription.activity_id || null,
-      status: 'pending',
-      motivation: payload.inscription.motivation || '',
-      previous_experience: payload.inscription.previous_experience || '',
-      preferred_schedule: payload.inscription.preferred_schedule || 'morning',
-      preferred_center: payload.inscription.preferred_center || 'ngozi',
-      notes: 'Submitted via online portal',
-      created_at: new Date().toISOString(),
-      student: fallbackStudent
-    };
-
     try {
       const response = await fetch(url, {
         method: 'POST',
@@ -484,19 +418,11 @@ export const ApiService = {
           inscription: json.data.inscription,
           message: json.message || 'Enrollment application submitted successfully!'
         };
-      } else if (json.message) {
-        return { success: false, message: json.message, errors: json.errors };
       }
-    } catch {
-      // Fallback
+      return { success: false, message: json.message || 'Enrollment submission failed.', errors: json.errors };
+    } catch (err) {
+      return { success: false, message: err?.message || 'Network error while submitting your enrollment.' };
     }
-
-    return {
-      success: true,
-      student: fallbackStudent,
-      inscription: fallbackInscription,
-      message: 'Enrollment application registered successfully! Please keep your reference number.'
-    };
   },
 
   // Post CRUD with single file featured_image and multiple files image_urls[]
@@ -550,7 +476,7 @@ export const ApiService = {
       const json = await response.json();
 
       if (response.ok && json.data) {
-        const featImg = formatImageUrl(json.data.featured_image) || postData.featured_image;
+        const featImg = formatImageUrl(json.data.featured_image) || '';
         const rawGallery = (json.data.image_urls && json.data.image_urls.length > 0)
           ? json.data.image_urls
           : [json.data.featured_image || ''];
@@ -559,26 +485,15 @@ export const ApiService = {
         const savedPost = {
           ...json.data,
           featured_image: featImg,
-          image_urls: gallery.length > 0 ? gallery : [featImg]
+          image_urls: gallery
         };
         return { success: true, post: savedPost, message: json.message };
       }
       if (json.message) return { success: false, message: json.message };
-    } catch {
-      // Fallback
+      return { success: false, message: 'Failed to save the post.' };
+    } catch (err) {
+      return { success: false, message: err?.message || 'Network error while saving the post.' };
     }
-
-    const fallbackPost = {
-      id: postData.id || Date.now(),
-      volet_id: postData.volet_id || 1,
-      title: postData.title || 'Untitled Post',
-      description: postData.description || '',
-      featured_image: postData.featured_image || 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=1200&q=80',
-      image_urls: postData.image_urls || [postData.featured_image || ''],
-      published_at: postData.published_at || new Date().toISOString().slice(0, 19).replace('T', ' '),
-      created_at: postData.created_at || new Date().toISOString()
-    };
-    return { success: true, post: fallbackPost };
   },
 
   async deletePost(id) {
@@ -621,26 +536,11 @@ export const ApiService = {
       if (response.ok && json.data) {
         return { success: true, campaign: json.data };
       }
-    } catch {
-      // Fallback
+      if (json.message) return { success: false, message: json.message };
+      return { success: false, message: 'Failed to save the campaign.' };
+    } catch (err) {
+      return { success: false, message: err?.message || 'Network error while saving the campaign.' };
     }
-
-    const saved = {
-      id: campaign.id || Date.now(),
-      volet_id: campaign.volet_id || 1,
-      activity_id: campaign.activity_id || null,
-      edition: campaign.edition || 'New Cohort',
-      title: campaign.title || 'Vocational Training Campaign',
-      description: campaign.description || '',
-      registration_start: campaign.registration_start || new Date().toISOString().slice(0, 10),
-      registration_end: campaign.registration_end || '',
-      start_date: campaign.start_date || '',
-      end_date: campaign.end_date || '',
-      place: campaign.place || 'Birashoboka Center, Ngozi & Bujumbura',
-      is_open: campaign.is_open !== undefined ? campaign.is_open : true,
-      quota: campaign.quota || 50
-    };
-    return { success: true, campaign: saved };
   },
 
   async deleteCampaign(id) {
@@ -695,23 +595,15 @@ export const ApiService = {
       if (response.ok && json.data) {
         const savedPartner = {
           ...json.data,
-          logo: formatImageUrl(json.data.logo) || partner.logo
+          logo: formatImageUrl(json.data.logo) || ''
         };
         return { success: true, partner: savedPartner };
       }
-    } catch {
-      // Fallback
+      if (json.message) return { success: false, message: json.message };
+      return { success: false, message: 'Failed to save the partner.' };
+    } catch (err) {
+      return { success: false, message: err?.message || 'Network error while saving the partner.' };
     }
-
-    const saved = {
-      id: partner.id || Date.now(),
-      name: partner.name || 'New Partner',
-      type: partner.type || 'Partner Organization',
-      logo: partner.logo || 'https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?auto=format&fit=crop&w=400&q=80',
-      website_url: partner.website_url,
-      volet_id: partner.volet_id || null
-    };
-    return { success: true, partner: saved };
   },
 
   async deletePartner(id) {
@@ -778,21 +670,11 @@ export const ApiService = {
         };
         return { success: true, volet: savedVolet };
       }
-    } catch {
-      // Fallback
+      if (json.message) return { success: false, message: json.message };
+      return { success: false, message: 'Failed to save the volet.' };
+    } catch (err) {
+      return { success: false, message: err?.message || 'Network error while saving the volet.' };
     }
-
-    const saved = {
-      id: volet.id || Date.now(),
-      name: volet.name || 'New Volet',
-      slogan: volet.slogan || '',
-      subtitle: volet.subtitle || '',
-      description: volet.description || '',
-      target: volet.target || 'all',
-      place: volet.place || 'Burundi',
-      carousel_images: volet.carousel_images || []
-    };
-    return { success: true, volet: saved };
   },
 
   async deleteVolet(id) {
@@ -835,18 +717,11 @@ export const ApiService = {
       if (response.ok && json.data) {
         return { success: true, activity: json.data };
       }
-    } catch {
-      // Fallback
+      if (json.message) return { success: false, message: json.message };
+      return { success: false, message: 'Failed to save the activity.' };
+    } catch (err) {
+      return { success: false, message: err?.message || 'Network error while saving the activity.' };
     }
-
-    const saved = {
-      id: activity.id || Date.now(),
-      volet_id: activity.volet_id || 1,
-      title: activity.title || 'New Activity',
-      description: activity.description || '',
-      icon: activity.icon || 'BookOpen'
-    };
-    return { success: true, activity: saved };
   },
 
   // Member CRUD with avatar file upload
@@ -884,23 +759,15 @@ export const ApiService = {
       if (response.ok && json.data) {
         const savedMember = {
           ...json.data,
-          avatar: formatImageUrl(json.data.avatar) || member.avatar
+          avatar: formatImageUrl(json.data.avatar) || ''
         };
         return { success: true, member: savedMember };
       }
-    } catch {
-      // Fallback
+      if (json.message) return { success: false, message: json.message };
+      return { success: false, message: 'Failed to save the team member.' };
+    } catch (err) {
+      return { success: false, message: err?.message || 'Network error while saving the team member.' };
     }
-
-    const saved = {
-      id: member.id || Date.now(),
-      name: member.name || 'Team Member',
-      position: member.position || 'Staff',
-      bio: member.bio || '',
-      avatar: member.avatar || 'https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=400&q=80',
-      email: member.email || 'contact@birashobokacenter.org'
-    };
-    return { success: true, member: saved };
   },
 
   async deleteMember(id) {
@@ -1041,25 +908,14 @@ export const ApiService = {
       const response = await fetch(url, { method, headers, body });
       const json = await response.json();
       if (response.ok && json.data) {
-        const saved = { ...json.data, photo: formatImageUrl(json.data.photo) || testimonial.photo };
+        const saved = { ...json.data, photo: formatImageUrl(json.data.photo) || '' };
         return { success: true, testimonial: saved };
       }
-    } catch {
-      // Fallback
+      if (json.message) return { success: false, message: json.message };
+      return { success: false, message: 'Failed to save the testimonial.' };
+    } catch (err) {
+      return { success: false, message: err?.message || 'Network error while saving the testimonial.' };
     }
-
-    return {
-      success: true,
-      testimonial: {
-        id: testimonial.id || Date.now(),
-        name: testimonial.name || 'New Testimonial',
-        role: testimonial.role || '',
-        content: testimonial.content || '',
-        rating: testimonial.rating || 5,
-        photo: testimonial.photo || null,
-        activity_id: testimonial.activity_id || null,
-      }
-    };
   },
 
   async deleteTestimonial(id) {

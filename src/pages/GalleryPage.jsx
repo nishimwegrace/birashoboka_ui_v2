@@ -108,36 +108,50 @@ export const GalleryPage = ({ posts, volets, navigate }) => {
         </div>
 
         {/* Gallery Grid with Infinite Scroll */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
-          {displayedImages.map((item) => (
-            <div
-              key={item.id}
-              onClick={() => navigate(`/news/${item.post.id}`)}
-              className="group relative aspect-square rounded-3xl overflow-hidden bg-slate-200 shadow-xs border border-slate-200/90 cursor-pointer hover:shadow-xl transition-all duration-300"
-            >
-              <img
-                src={item.imageUrl}
-                alt={item.post.title}
-                loading="lazy"
-                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-              />
+        {displayedImages.length > 0 ? (
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+            {displayedImages.map((item) => (
+              <div
+                key={item.id}
+                onClick={() => navigate(`/news/${item.post.id}`)}
+                className="group relative aspect-square rounded-3xl overflow-hidden bg-slate-200 shadow-xs border border-slate-200/90 cursor-pointer hover:shadow-xl transition-all duration-300"
+              >
+                <img
+                  src={item.imageUrl}
+                  alt={item.post.title}
+                  loading="lazy"
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                />
 
-              {/* Hover Details Card */}
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 p-5 flex flex-col justify-end text-white">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-blue-300 mb-1">
-                  {item.post.volet?.name || 'Birashoboka'}
-                </span>
-                <h4 className="text-xs sm:text-sm text-white font-bold line-clamp-2 leading-snug">
-                  {item.post.title}
-                </h4>
-                <div className="mt-2.5 flex items-center gap-1 text-xs text-blue-400 font-bold">
-                  <span>Read Article</span>
-                  <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                {/* Hover Details Card */}
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 p-5 flex flex-col justify-end text-white">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-blue-300 mb-1">
+                    {item.post.volet?.name || 'Birashoboka'}
+                  </span>
+                  <h4 className="text-xs sm:text-sm text-white font-bold line-clamp-2 leading-snug">
+                    {item.post.title}
+                  </h4>
+                  <div className="mt-2.5 flex items-center gap-1 text-xs text-blue-400 font-bold">
+                    <span>Read Article</span>
+                    <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                  </div>
                 </div>
               </div>
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-20 bg-white rounded-3xl border border-slate-200 shadow-xs">
+            <div className="mx-auto w-14 h-14 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mb-4">
+              <Eye className="w-6 h-6" />
             </div>
-          ))}
-        </div>
+            <h3 className="text-lg font-bold text-slate-900">No gallery photos yet</h3>
+            <p className="text-sm text-slate-500 mt-1">
+              {allImages.length === 0
+                ? 'Photos from our field activities will appear here.'
+                : 'No photos match your current filter.'}
+            </p>
+          </div>
+        )}
 
         {/* Infinite Scroll Trigger */}
         <div ref={loaderRef} className="py-10 text-center">

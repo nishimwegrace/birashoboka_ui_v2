@@ -30,67 +30,79 @@ export const LatestNewsSection = ({ posts, navigate }) => {
         </div>
 
         {/* 10 Latest Posts Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7">
-          {latestPosts.map((post, idx) => {
-            const formattedDate = post.published_at 
-              ? new Date(post.published_at).toLocaleDateString('en-US', {
-                  month: 'short',
-                  day: 'numeric',
-                  year: 'numeric'
-                })
-              : 'Recent Update';
+        {latestPosts.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7">
+            {latestPosts.map((post, idx) => {
+              const formattedDate = post.published_at 
+                ? new Date(post.published_at).toLocaleDateString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric'
+                  })
+                : 'Recent Update';
 
-            return (
-              <article
-                key={post.id || idx}
-                onClick={() => navigate(`/news/${post.id}`)}
-                className="bg-white rounded-3xl border border-slate-200/90 overflow-hidden shadow-xs hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col group cursor-pointer"
-              >
-                {/* Image Wrap */}
-                <div className="relative aspect-16/10 overflow-hidden bg-slate-100">
-                  <img
-                    src={post.featured_image }
-                    alt={post.title}
-                    loading="lazy"
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                  <div className="absolute top-3.5 left-3.5">
-                    <span className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-white/95 backdrop-blur-md text-blue-700 shadow-sm border border-slate-100">
-                      {post.volet?.name || 'Birashoboka'}
-                    </span>
+              return (
+                <article
+                  key={post.id || idx}
+                  onClick={() => navigate(`/news/${post.id}`)}
+                  className="bg-white rounded-3xl border border-slate-200/90 overflow-hidden shadow-xs hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col group cursor-pointer"
+                >
+                  {/* Image Wrap */}
+                  <div className="relative aspect-16/10 overflow-hidden bg-slate-100">
+                    <img
+                      src={post.featured_image }
+                      alt={post.title}
+                      loading="lazy"
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                    <div className="absolute top-3.5 left-3.5">
+                      <span className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-white/95 backdrop-blur-md text-blue-700 shadow-sm border border-slate-100">
+                        {post.volet?.name || 'Birashoboka'}
+                      </span>
+                    </div>
                   </div>
-                </div>
 
-                {/* Body */}
-                <div className="p-6 flex-1 flex flex-col justify-between space-y-4">
-                  <div>
-                    {/* Meta info */}
-                    <div className="flex items-center gap-2 text-xs text-slate-500 font-medium mb-2.5">
-                      <Calendar className="w-3.5 h-3.5 text-slate-400" />
-                      <span>{formattedDate}</span>
+                  {/* Body */}
+                  <div className="p-6 flex-1 flex flex-col justify-between space-y-4">
+                    <div>
+                      {/* Meta info */}
+                      <div className="flex items-center gap-2 text-xs text-slate-500 font-medium mb-2.5">
+                        <Calendar className="w-3.5 h-3.5 text-slate-400" />
+                        <span>{formattedDate}</span>
+                      </div>
+
+                      {/* Title */}
+                      <h3 className="text-lg font-bold text-slate-900 leading-snug group-hover:text-blue-600 transition-colors line-clamp-2">
+                        {post.title}
+                      </h3>
+
+                      {/* Excerpt */}
+                      <p className="text-xs sm:text-sm text-slate-600 mt-2 line-clamp-3 leading-relaxed">
+                        {post.description}
+                      </p>
                     </div>
 
-                    {/* Title */}
-                    <h3 className="text-lg font-bold text-slate-900 leading-snug group-hover:text-blue-600 transition-colors line-clamp-2">
-                      {post.title}
-                    </h3>
-
-                    {/* Excerpt */}
-                    <p className="text-xs sm:text-sm text-slate-600 mt-2 line-clamp-3 leading-relaxed">
-                      {post.description}
-                    </p>
+                    {/* Read story footer */}
+                    <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-blue-600 group-hover:text-blue-700">
+                      <span>Read Full Article</span>
+                      <ArrowRight className="w-4 h-4 transform group-hover:translate-x-1 transition-transform" />
+                    </div>
                   </div>
-
-                  {/* Read story footer */}
-                  <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-blue-600 group-hover:text-blue-700">
-                    <span>Read Full Article</span>
-                    <ArrowRight className="w-4 h-4 transform group-hover:translate-x-1 transition-transform" />
-                  </div>
-                </div>
-              </article>
-            );
-          })}
-        </div>
+                </article>
+              );
+            })}
+          </div>
+        ) : (
+          <div className="text-center py-16 bg-white rounded-3xl border border-slate-200 shadow-xs">
+            <div className="mx-auto w-14 h-14 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mb-4">
+              <Tag className="w-6 h-6" />
+            </div>
+            <h3 className="text-lg font-bold text-slate-900">No news stories yet</h3>
+            <p className="text-sm text-slate-500 mt-1">
+              Recent activities and updates will be published here.
+            </p>
+          </div>
+        )}
 
         {/* Bottom View All CTA */}
         <div className="mt-12 text-center">

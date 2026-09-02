@@ -46,8 +46,8 @@ export const HeroCarousel = ({ posts, navigate }) => {
           }`}
         >
           <img
-            src={post.featured_image || 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=1600&q=80'}
-            alt={post.title}
+            src={post.featured_image}
+            alt={post.title || (post.volet?.name ? `${post.volet.name} news` : 'News')}
             className="w-full h-full object-cover object-center transform transition-transform duration-7000 ease-out"
           />
           {/* Multi-layered cinematic gradient overlays for pristine readability */}
