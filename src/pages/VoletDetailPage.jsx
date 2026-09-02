@@ -245,10 +245,6 @@ export const VoletDetailPage = ({
                     {act.description}
                   </p>
                 </div>
-                <div className="mt-6 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-blue-600">
-                  <span>Certified Module</span>
-                  <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                </div>
               </div>
             ))}
           </div>
