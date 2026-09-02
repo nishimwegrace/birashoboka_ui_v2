@@ -83,6 +83,7 @@ export const AdminDashboard = ({
   // Volet modal
   const [voletModalOpen, setVoletModalOpen] = useState(false);
   const [editingVolet, setEditingVolet] = useState(null);
+  const [voletCarouselFiles, setVoletCarouselFiles] = useState([]);
 
   // Activity modal
   const [activityModalOpen, setActivityModalOpen] = useState(false);
@@ -320,7 +321,7 @@ export const AdminDashboard = ({
     e.preventDefault();
     if (!editingVolet?.name) return;
 
-    const res = await ApiService.saveVolet(editingVolet);
+    const res = await ApiService.saveVolet(editingVolet, { carousel_images: voletCarouselFiles });
     const saved = res.volet || editingVolet;
 
     if (editingVolet.id) {
@@ -333,6 +334,7 @@ export const AdminDashboard = ({
     }
     setVoletModalOpen(false);
     setEditingVolet(null);
+    setVoletCarouselFiles([]);
   };
 
   const handleDeleteVolet = async (id) => {
@@ -1098,6 +1100,7 @@ export const AdminDashboard = ({
                 <button
                   onClick={() => {
                     setEditingVolet({ target: 'women', place: 'Ngozi & Bujumbura, Burundi' });
+                    setVoletCarouselFiles([]);
                     setVoletModalOpen(true);
                   }}
                   className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-md shadow-blue-600/20 transition cursor-pointer"
@@ -1129,6 +1132,7 @@ export const AdminDashboard = ({
                         <button
                           onClick={() => {
                             setEditingVolet(v);
+                            setVoletCarouselFiles([]);
                             setVoletModalOpen(true);
                           }}
                           className="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold transition cursor-pointer border border-slate-200"
@@ -1999,6 +2003,31 @@ export const AdminDashboard = ({
                   className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-300 text-slate-900 text-sm focus:bg-white focus:ring-2 focus:ring-blue-500"
                 />
               </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Carousel Images (Upload Multiple)</label>
+              <input
+                type="file"
+                accept="image/*"
+                multiple
+                onChange={(e) => {
+                  if (e.target.files) {
+                    setVoletCarouselFiles(Array.from(e.target.files));
+                  }
+                }}
+                className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-300 text-slate-900 text-xs file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700 cursor-pointer"
+              />
+              {voletCarouselFiles.length > 0 && (
+                <div className="mt-1 text-[11px] text-emerald-600 font-semibold">
+                  ✓ {voletCarouselFiles.length} file(s) selected for carousel upload
+                </div>
+              )}
+              {editingVolet.id && Array.isArray(editingVolet.carousel_images) && editingVolet.carousel_images.length > 0 && (
+                <div className="mt-1 text-[11px] text-slate-500">
+                  Currently {editingVolet.carousel_images.length} carousel image(s) on this volet
+                </div>
+              )}
             </div>
 
             <div className="flex justify-end gap-3 pt-3">

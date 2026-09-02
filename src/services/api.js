@@ -138,6 +138,7 @@ export const ApiService = {
     // Attach local relations if missing
     const enriched = items.map(v => ({
       ...v,
+      carousel_images: Array.isArray(v.carousel_images) ? v.carousel_images.map(img => formatImageUrl(img)).filter(Boolean) : [],
       activities: v.activities || SEED_ACTIVITIES.filter(a => a.volet_id === v.id),
       posts: v.posts || SEED_POSTS.filter(p => p.volet_id === v.id),
       partners: v.partners || SEED_PARTNERS.filter(p => p.volet_id === v.id),
@@ -154,6 +155,7 @@ export const ApiService = {
     if (!res.data) return { data: null, isLive: res.isLive };
 
     const volet = { ...res.data };
+    volet.carousel_images = Array.isArray(volet.carousel_images) ? volet.carousel_images.map(img => formatImageUrl(img)).filter(Boolean) : [];
     if (!volet.activities || volet.activities.length === 0) {
       volet.activities = SEED_ACTIVITIES.filter(a => a.volet_id === volet.id);
     }
@@ -729,8 +731,8 @@ export const ApiService = {
     return { success: true };
   },
 
-  // Volet CRUD
-  async saveVolet(volet) {
+  // Volet CRUD with multiple carousel_images uploads
+  async saveVolet(volet, files = {}) {
     const baseUrl = getStoredApiBaseUrl();
     const token = getStoredAuthToken();
     const cleanBase = baseUrl.replace(/\/+$/, '');
@@ -739,18 +741,42 @@ export const ApiService = {
       ? (isUpdate ? `${cleanBase}/api/volets/${volet.id}` : `${cleanBase}/api/volets`)
       : (isUpdate ? `/api/volets/${volet.id}` : '/api/volets');
 
+    const hasCarouselFiles = Array.isArray(files.carousel_images) && files.carousel_images.some(f => f instanceof File);
+
     try {
-      const headers = { 'Content-Type': 'application/json', 'Accept': 'application/json' };
+      const headers = { 'Accept': 'application/json' };
       if (token) headers['Authorization'] = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
 
-      const response = await fetch(url, {
-        method: isUpdate ? 'PUT' : 'POST',
-        headers,
-        body: JSON.stringify(volet)
-      });
+      let body;
+      if (hasCarouselFiles) {
+        body = new FormData();
+        body.append('name', volet.name || '');
+        if (volet.slogan) body.append('slogan', volet.slogan);
+        if (volet.subtitle) body.append('subtitle', volet.subtitle);
+        if (volet.description) body.append('description', volet.description);
+        if (volet.target) body.append('target', volet.target);
+        if (volet.place) body.append('place', volet.place);
+        for (const file of files.carousel_images) {
+          if (file instanceof File) {
+            body.append('carousel_images[]', file);
+          }
+        }
+      } else {
+        headers['Content-Type'] = 'application/json';
+        body = JSON.stringify(volet);
+      }
+
+      const method = isUpdate ? (hasCarouselFiles ? 'POST' : 'PUT') : 'POST';
+      const response = await fetch(url, { method, headers, body });
       const json = await response.json();
       if (response.ok && json.data) {
-        return { success: true, volet: json.data };
+        const savedVolet = {
+          ...json.data,
+          carousel_images: Array.isArray(json.data.carousel_images)
+            ? json.data.carousel_images.map(img => formatImageUrl(img)).filter(Boolean)
+            : []
+        };
+        return { success: true, volet: savedVolet };
       }
     } catch {
       // Fallback
@@ -763,7 +789,8 @@ export const ApiService = {
       subtitle: volet.subtitle || '',
       description: volet.description || '',
       target: volet.target || 'all',
-      place: volet.place || 'Burundi'
+      place: volet.place || 'Burundi',
+      carousel_images: volet.carousel_images || []
     };
     return { success: true, volet: saved };
   },

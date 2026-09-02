@@ -40,10 +40,11 @@ export const VoletDetailPage = ({
   const voletActivities = activities.filter(a => a.volet_id === volet.id);
   const voletCampaigns = campaigns.filter(c => c.volet_id === volet.id);
 
-  // Carousel images from posts related to that volet
-  const carouselImages = voletPosts
-    .flatMap(p => (p.image_urls && p.image_urls.length > 0 ? p.image_urls : [p.featured_image || '']))
-    .filter(Boolean);
+  // Carousel images from the volet's own carousel_images array
+  const carouselImages = (volet.carousel_images && volet.carousel_images.length > 0
+    ? volet.carousel_images
+    : []
+  ).filter(Boolean);
 
   const [activeSlide, setActiveSlide] = useState(0);
 
@@ -65,7 +66,7 @@ export const VoletDetailPage = ({
   return (
     <div className="w-full bg-slate-50">
       
-      {/* Top Banner Carousel with Images from {Posts} related to this {Volet} */}
+      {/* Top Banner Carousel with Volet carousel_images */}
       <div className="relative w-full h-[400px] sm:h-[480px] bg-slate-950 overflow-hidden">
         {carouselImages.length > 0 ? (
           carouselImages.map((img, idx) => (

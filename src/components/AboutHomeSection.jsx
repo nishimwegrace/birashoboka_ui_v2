@@ -78,19 +78,27 @@ export const AboutHomeSection = ({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
               <div className="flex items-start gap-2.5">
                 <CheckCircle className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" />
-                <span className="text-sm font-medium text-slate-700">Market-aligned vocational training</span>
+                <span className="text-sm font-medium text-slate-700">Psychothrapy</span>
               </div>
               <div className="flex items-start gap-2.5">
                 <CheckCircle className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" />
-                <span className="text-sm font-medium text-slate-700">Psychosocial therapy & trauma support</span>
+                <span className="text-sm font-medium text-slate-700">Community Resilience Service</span>
               </div>
               <div className="flex items-start gap-2.5">
                 <CheckCircle className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" />
-                <span className="text-sm font-medium text-slate-700">Child protection & anti-fraud governance</span>
+                <span className="text-sm font-medium text-slate-700">Art and therapy</span>
               </div>
               <div className="flex items-start gap-2.5">
                 <CheckCircle className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" />
-                <span className="text-sm font-medium text-slate-700">Micro-enterprise incubation & kits</span>
+                <span className="text-sm font-medium text-slate-700">Professional reintegration</span>
+              </div>
+              <div className="flex items-start gap-2.5">
+                <CheckCircle className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" />
+                <span className="text-sm font-medium text-slate-700">Support for young people and teenagers</span>
+              </div>
+              <div className="flex items-start gap-2.5">
+                <CheckCircle className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" />
+                <span className="text-sm font-medium text-slate-700">Support for people with addiction</span>
               </div>
             </div>
 

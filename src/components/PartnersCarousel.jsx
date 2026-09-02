@@ -68,7 +68,7 @@ export const PartnersCarousel = ({ partners, navigate }) => {
               <div
                 key={`${partner.id}-${index}`}
                 onClick={() => navigate('/partners')}
-                className="shrink-0 flex items-center justify-center grayscale hover:grayscale-0 opacity-75 hover:opacity-100 transition-all duration-300 cursor-pointer group"
+                className="shrink-0 flex items-center justify-center transition-all duration-300 cursor-pointer group"
               >
                 {partner.logo ? (
                   <div className="flex items-center justify-center p-2 rounded-xl hover:bg-slate-50 transition">

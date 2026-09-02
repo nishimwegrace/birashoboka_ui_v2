@@ -48,12 +48,26 @@ export const ProgramsPage = ({
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {filteredVolets.map((volet) => {
             const voletActs = activities.filter(a => a.volet_id === volet.id);
+            const featuredImage = (volet.carousel_images && volet.carousel_images.length > 0)
+              ? volet.carousel_images[0]
+              : null;
 
             return (
               <div
                 key={volet.id}
-                className="bg-white rounded-3xl border border-slate-200/90 shadow-sm hover:shadow-xl hover:border-blue-300 transition-all p-8 flex flex-col justify-between"
+                className="bg-white rounded-3xl border border-slate-200/90 shadow-sm hover:shadow-xl hover:border-blue-300 transition-all overflow-hidden flex flex-col justify-between"
               >
+                {featuredImage && (
+                  <div className="aspect-16/10 overflow-hidden bg-slate-100">
+                    <img
+                      src={featuredImage}
+                      alt={volet.name}
+                      className="w-full h-full object-cover object-center hover:scale-105 transition duration-300"
+                    />
+                  </div>
+                )}
+
+                <div className="p-8 flex flex-col flex-1">
                 <div>
                   <div className="flex items-center justify-between gap-2 mb-4">
                     <span className="px-3 py-1 rounded-full text-xs font-extrabold uppercase tracking-wider bg-blue-600 text-white">
@@ -116,6 +130,7 @@ export const ProgramsPage = ({
                   >
                     Inquire / Enroll &rarr;
                   </button>
+                </div>
                 </div>
               </div>
             );

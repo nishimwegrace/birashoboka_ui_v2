@@ -7,6 +7,11 @@ export const SEED_VOLETS = [
     description: 'The CRBN program supports vulnerable young girls and women towards a successful and dignified reintegration into society. Our holistic approach combines market-relevant practical vocational skills with intensive psychosocial counseling to ensure lasting empowerment and family reconciliation.',
     target: 'women',
     place: 'Ngozi & Bujumbura Mairie, Burundi',
+    carousel_images: [
+      'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=1600&q=80',
+      'https://images.unsplash.com/photo-1531206715517-5c0ba140b2b8?auto=format&fit=crop&w=1600&q=80',
+      'https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=1600&q=80'
+    ],
   },
   {
     id: 2,
@@ -16,6 +21,11 @@ export const SEED_VOLETS = [
     description: 'The Chris Lyricure Center provides open community vocational training sessions in Maramvya and Bujumbura. Courses deliver immediately marketable skills allowing our graduates to create self-sustaining micro-enterprises or integrate into the local formal economy.',
     target: 'all',
     place: 'Maramvya & Bujumbura Centre, Burundi',
+    carousel_images: [
+      'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1600&q=80',
+      'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1600&q=80',
+      'https://images.unsplash.com/photo-1558769132-cb1aea458c5e?auto=format&fit=crop&w=1600&q=80'
+    ],
   }
 ];
 
